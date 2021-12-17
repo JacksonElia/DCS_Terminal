@@ -2,8 +2,8 @@ import undetected_chromedriver as uc
 from SeleniumManager import *
 
 # ⬇⬇⬇ What to Change ⬇⬇⬇ Placeholder until we get the json file and user input setup
-email = "jgelia@students.chccs.k12.nc.us"
-password = "Greenpig1!"
+email = "johnsmith@gmail.com"
+password = "271857037"
 link = "https://campus.datacamp.com/courses/joining-data-with-pandas/advanced-merging-and-concatenating?ex=4"
 # ⬆⬆⬆ What to Change ⬆⬆⬆
 
