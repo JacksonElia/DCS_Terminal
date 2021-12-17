@@ -3,6 +3,7 @@ import selenium
 import time
 import html
 import numpy as np
+import requests
 from ast import literal_eval
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
@@ -110,8 +111,11 @@ class SeleniumManager:
         api_link: A formattable string with place for an ID
         '''
         pages = []
+        cookies = self.driver.get_cookies()
         for id in ids:
             self.driver.get(api_link.format(id))
+            request = requests.get(url=api_link.format(id), data=cookies[0])
+            print(request.text)
             source = self.driver.find_element(By.XPATH, "/html/body/pre")
             element = literal_eval(source.get_attribute("textContent"))
             solution = html.unescape(element["solution"])
