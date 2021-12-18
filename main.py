@@ -2,8 +2,8 @@ import undetected_chromedriver as uc
 from SeleniumManager import *
 
 # ⬇⬇⬇ What to Change ⬇⬇⬇ Placeholder until we get the json file and user input setup
-email = "johnsmith@gmail.com"
-password = "573869837"
+email = "jgelia@students.chccs.k12.nc.us"
+password = "132154524"
 link = "https://campus.datacamp.com/courses/joining-data-with-pandas/advanced-merging-and-concatenating?ex=4"
 # ⬆⬆⬆ What to Change ⬆⬆⬆
 
@@ -22,9 +22,8 @@ def main():
     selenium_manager = SeleniumManager(driver)
 
     selenium_manager.login(email, password, timeout=10)
-    ids = selenium_manager.get_page_ids(link)
-    answers = selenium_manager.api_lookup(ids)
-    # [print(f"\nAnswer #{i + 1}:\n{a}\n") for i, a in enumerate(answers)]
+    solutions = selenium_manager.get_solutions(link)
+    print(*solutions)
     driver.quit()  # Necessary for proper closing of driver, will leave a footprint in ram otherwise
 
 

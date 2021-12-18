@@ -1,10 +1,8 @@
 # Imports
 import selenium
 import time
-import html
-import numpy as np
-import requests
 from ast import literal_eval
+from html import unescape
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
@@ -20,7 +18,6 @@ class SeleniumManager:
               timeout=15):
         '''
         Logs into datacamp.
-        driver: Any selenium webdriver
         username: Username or email for login
         password: Corresponding password for login
         link: The URL of the login page
@@ -72,6 +69,25 @@ class SeleniumManager:
         except selenium.common.exceptions.TimeoutException:
             print("Error Verifying Sign In")
 
+    def get_solutions(self, link: str) -> list:
+        '''
+        Uses a datacamp assignment link to get all the solutions for a chapter
+        link: The URL of the page
+        '''
+        self.driver.get(link)
+        script = self.driver.find_element(By.XPATH, "/html/body/script[1]").get_attribute("textContent")
+        script = unescape(script)
+        solutions = []
+        for segment in script.split(",["):
+            if ',"solution",' in segment and '"type","NormalExercise","id"' in segment:
+                # Slices solution from src code
+                solution = segment[segment.find('"solution","') + 12: segment.find('","type"')]
+                # Formats solution into usable strings/code
+                solution = literal_eval('"'+unescape(literal_eval('"'+solution+'"'))+'"')
+                solutions.append(solution)
+        return solutions
+
+# Legacy methods
     # def get_page_source(driver: selenium.webdriver, link: str) -> str:
     #     '''
     #     Returns the full HTML page source of a given link.
@@ -81,44 +97,41 @@ class SeleniumManager:
     #     driver.get(link)
     #     return driver.page_source
 
-    def get_page_ids(self, link: str) -> list:
-        '''
-        Uses a datacamp assignment link to get all the required IDs for an API lookup
-        driver: Any selenium webdriver
-        link: The URL of the page
-        '''
-        self.driver.get(link)
-
-        script = self.driver.find_element(By.XPATH, "/html/body/script[1]").get_attribute("textContent")
-        script = html.unescape(script)
-        ids = []
-        for p in script.split("],"):
-            if '"NormalExercise",' in p and '"id",' in p:
-                i_start = p.find('"id",') + 5
-                i_end = p[i_start:].find(",")
-                if i_end == -1: i_end = p[i_start:].find("]")
-                id = p[i_start:i_end + i_start]
-                ids.append(int(id))
-
-        return list(np.unique(ids))
-
-    def api_lookup(self, ids: list,
-                   api_link="https://campus-api.datacamp.com/api/exercises/{}/get_solution") -> list:
-        '''
-        Looks up a list of IDs and returns the API solution.
-        driver: Any selenium webdriver
-        ids: All IDs that will be looked up
-        api_link: A formattable string with place for an ID
-        '''
-        pages = []
-        cookies = self.driver.get_cookies()
-        for id in ids:
-            self.driver.get(api_link.format(id))
-            request = requests.get(url=api_link.format(id), data=cookies[0])
-            print(request.text)
-            source = self.driver.find_element(By.XPATH, "/html/body/pre")
-            element = literal_eval(source.get_attribute("textContent"))
-            solution = html.unescape(element["solution"])
-            pages.append(solution)
-
-        return pages
+    # def get_page_ids(self, link: str) -> list:
+    #     '''
+    #     Uses a datacamp assignment link to get all the required IDs for an API lookup
+    #     driver: Any selenium webdriver
+    #     link: The URL of the page
+    #     '''
+    #     self.driver.get(link)
+    #
+    #     script = self.driver.find_element(By.XPATH, "/html/body/script[1]").get_attribute("textContent")
+    #     script = html.unescape(script)
+    #     ids = []
+    #     for p in script.split("],"):
+    #         if '"NormalExercise",' in p and '"id",' in p:
+    #             i_start = p.find('"id",') + 5
+    #             i_end = p[i_start:].find(",")
+    #             if i_end == -1: i_end = p[i_start:].find("]")
+    #             id = p[i_start:i_end + i_start]
+    #             ids.append(int(id))
+    #
+    #     return list(np.unique(ids))
+    #
+    # def api_lookup(self, ids: list,
+    #                api_link="https://campus-api.datacamp.com/api/exercises/{}/get_solution") -> list:
+    #     '''
+    #     Looks up a list of IDs and returns the API solution.
+    #     driver: Any selenium webdriver
+    #     ids: All IDs that will be looked up
+    #     api_link: A formattable string with place for an ID
+    #     '''
+    #     pages = []
+    #     for id in ids:
+    #         self.driver.get(api_link.format(id))
+    #         source = self.driver.find_element(By.XPATH, "/html/body/pre")
+    #         element = literal_eval(source.get_attribute("textContent"))
+    #         solution = html.unescape(element["solution"])
+    #         pages.append(solution)
+    #
+    #     return pages
