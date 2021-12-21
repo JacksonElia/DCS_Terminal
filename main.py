@@ -3,8 +3,8 @@ from SeleniumManager import *
 
 # ⬇⬇⬇ What to Change ⬇⬇⬇ Placeholder until we get the json file and user input setup
 email = "jgelia@students.chccs.k12.nc.us"
-password = "132154524"
-link = "https://campus.datacamp.com/courses/joining-data-with-pandas/advanced-merging-and-concatenating?ex=4"
+password = "bruh u thoought"
+link = "https://campus.datacamp.com/courses/introduction-to-sql/selecting-columns?ex=10"
 # ⬆⬆⬆ What to Change ⬆⬆⬆
 
 
@@ -19,11 +19,13 @@ def main():
     # driver = uc.Chrome(options=options)
 
     driver = uc.Chrome()
-    selenium_manager = SeleniumManager(driver)
 
+    selenium_manager = SeleniumManager(driver)
     selenium_manager.login(email, password, timeout=10)
     solutions = selenium_manager.get_solutions(link)
+    selenium_manager.solve_multiple2(timeout=10)
     print(*solutions)
+    sleep(10)
     driver.quit()  # Necessary for proper closing of driver, will leave a footprint in ram otherwise
 
 
