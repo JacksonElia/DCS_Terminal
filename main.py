@@ -3,8 +3,8 @@ from SeleniumManager import *
 
 # ⬇⬇⬇ What to Change ⬇⬇⬇ Placeholder until we get the json file and user input setup
 email = "jgelia@students.chccs.k12.nc.us"
-password = "L"
-link = "https://campus.datacamp.com/courses/joining-data-with-pandas/merging-tables-with-different-join-types?ex=11"
+password = "Greenpig1!"
+link = "https://campus.datacamp.com/courses/joining-data-with-pandas/data-merging-basics?ex=7"
 # ⬆⬆⬆ What to Change ⬆⬆⬆
 
 
@@ -23,9 +23,21 @@ def main():
     selenium_manager = SeleniumManager(driver)
     selenium_manager.login(email, password, timeout=10)
     solutions = selenium_manager.get_solutions(link)
-    selenium_manager.solve_multiple1()
-    #print(*solutions)
-    sleep(10)
+    solution = """# Merge the licenses and biz_owners table on account
+licenses_owners = licenses.merge(biz_owners, on='account')
+
+# Group the results by title then count the number of accounts
+counted_df = licenses_owners.groupby('title').agg({'account':'count'})
+
+# Sort the counted_df in desending order
+sorted_df = counted_df.sort_values(by='account', ascending=False)
+
+# Use .head() method to print the first few rows of sorted_df
+print(sorted_df.head())"""
+
+    selenium_manager.solve_normal_exercise(solution, 10)
+    print(*solutions)
+    sleep(100)
     driver.quit()  # Necessary for proper closing of driver, will leave a footprint in ram otherwise
 
 

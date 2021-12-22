@@ -1,4 +1,5 @@
 # Imports
+import pyperclip
 import selenium
 import selenium.common.exceptions
 from ast import literal_eval
@@ -89,7 +90,7 @@ class SeleniumManager:
                 # Formats solution into usable strings/code
                 solution = literal_eval('"' + unescape(literal_eval('"' + solution + '"')) + '"')
                 solutions.append(solution)
-                #print(segment)
+                # print(segment)
         return solutions
 
     # TODO: If possible identify the exercise by the page's responses
@@ -118,16 +119,23 @@ class SeleniumManager:
             xp_amount = WebDriverWait(self.driver, timeout=timeout) \
                 .until(lambda d: d.find_element(By.XPATH,
                                                 '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[1]/div/div/strong'))
-            print(xp_amount.text)
             # TODO: Find cleaner way of identifying normal exercises
             if xp_amount.text == "100 XP":
+                script_margin = WebDriverWait(self.driver, timeout=timeout) \
+                    .until(lambda d: d.find_element(By.XPATH,
+                                                    '//*[@id="rendered-view"]/div/div/div[3]/div[1]'))
+                # Clicks on the script to put it in focus
+                script_margin.click()
+
+                sleep(1)  # Might not be necessary
+
                 action_chain = ActionChains(self.driver)
                 # Sends CTRL + A
-                action_chain.key_down(Keys.CONTROL).send_keys("A").key_up(Keys.CONTROL).perform()
-                # TODO: Find cleaner way to fix it not selecting everything the first time
-                action_chain.key_down(Keys.CONTROL).send_keys("A").key_up(Keys.CONTROL).perform()
-                # Types the solution
-                action_chain.send_keys(solution).perform()
+                action_chain.key_down(Keys.CONTROL).send_keys("a").key_up(Keys.CONTROL).perform()
+                pyperclip.copy(solution)
+                # Pastes the solution
+                # TODO: Make it work for OSX
+                action_chain.key_down(Keys.CONTROL).send_keys("v").key_up(Keys.CONTROL).perform()
             else:
                 print("Most likely not a normal exercise")
                 return solved_exercise
@@ -155,8 +163,63 @@ class SeleniumManager:
             print("Submit Answer or Continue button not found, most likely not a normal exercise")
             return solved_exercise
 
-    def solve_tab_exercises(self, solutions: list, timeout: int):
-        pass
+    def solve_tab_exercises(self, solutions: [str], timeout: int):
+        solved_exercise = False
+        try:
+            xp_amount = WebDriverWait(self.driver, timeout=timeout) \
+                .until(lambda d: d.find_element(By.XPATH,
+                                                '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[1]/div/div/strong'))
+            # TODO: Find better way of doing this, won't always work
+            if xp_amount.text != "100 XP":
+                number_of_exercises = (WebDriverWait(self.driver, timeout=timeout)
+                                       .until(lambda d: d.find_element(By.XPATH,
+                                                                       '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[1]/div/div/h5'))).text[-1]
+                if len(solutions) == int(number_of_exercises):
+                    for solution in solutions:
+                        script_margin = WebDriverWait(self.driver, timeout=timeout) \
+                            .until(lambda d: d.find_element(By.XPATH,
+                                                            '//*[@id="rendered-view"]/div/div/div[3]/div[1]'))
+                        # Clicks on the script to put it in focus
+                        script_margin.click()
+
+                        sleep(1)  # Might not be necessary, doesn't select everything
+
+                        action_chain = ActionChains(self.driver)
+
+                        # Sends CTRL + A
+                        action_chain.key_down(Keys.CONTROL).send_keys("a").key_up(Keys.CONTROL).perform()
+                        # Types the solution
+                        # Doesn't always work because it is too slow and messes up with Datacamps's autocomplete
+                        # action_chain.send_keys(solution).perform()
+                        # Copies the solution to clipboard
+                        pyperclip.copy(solution)
+                        # Pastes the solution
+                        # TODO: Make it work for OSX
+                        action_chain.key_down(Keys.CONTROL).send_keys("v").key_up(Keys.CONTROL).perform()
+                        submit_answer_button = WebDriverWait(self.driver, timeout=timeout) \
+                            .until(lambda d: d.find_element(By.XPATH,
+                                                            '//*[@id="gl-editorTabs-files/script.py"]/div/div/div[2]/div[2]/button[3]'))
+                        sleep(3)  # Might not be necessary
+                        submit_answer_button.click()
+                        print("Submit Answer button clicked")
+                        # Clears clipboard
+                        pyperclip.copy("")
+
+                    continue_button = WebDriverWait(self.driver, timeout=3) \
+                        .until(lambda d: d.find_element(By.XPATH,
+                                                        '//*[@id="gl-aside"]/div/aside/div[2]/div/div[3]/button'))
+                    continue_button.click()
+                    print("Clicked the continue button")
+                    solved_exercise = True
+                    return solved_exercise
+            else:
+                print("Maybe not a tab exercise")
+                return solved_exercise
+        except selenium.common.exceptions.ElementNotInteractableException:
+            print("Continue button couldn't be clicked")
+        except selenium.common.exceptions.TimeoutException:
+            print("Python script not found, most likely not a tab exercise")
+            return solved_exercise
 
     # TODO: Optimize timeouts
     # There are different multiple choice problems, this one allows the user to press a number to select an answer
@@ -208,7 +271,8 @@ class SeleniumManager:
 
         try:
             # Gets the length of the child elements (the multiple choice options) in the parent element
-            multiple_choice_options = len(self.driver.find_elements_by_xpath('//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[2]/div/div/div[2]/ul/*'))
+            multiple_choice_options = len(self.driver.find_elements_by_xpath(
+                '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[2]/div/div/div[2]/ul/*'))
             for i in range(0, multiple_choice_options):
                 radio_input_button = WebDriverWait(self.driver, timeout=3) \
                     .until(lambda d: d.find_element(By.XPATH,
