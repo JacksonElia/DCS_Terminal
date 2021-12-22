@@ -3,7 +3,7 @@ from SeleniumManager import *
 
 # ⬇⬇⬇ What to Change ⬇⬇⬇ Placeholder until we get the json file and user input setup
 email = "jgelia@students.chccs.k12.nc.us"
-password = "Greenpig1!"
+password = "lol"
 link = "https://campus.datacamp.com/courses/joining-data-with-pandas/data-merging-basics?ex=7"
 # ⬆⬆⬆ What to Change ⬆⬆⬆
 
