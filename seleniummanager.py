@@ -1,4 +1,8 @@
-# Imports
+"""
+seleniummanager.py: Responsible for everything to do with Selenium including launching the webdriver, getting the
+the solutions to the Datacamp questions, and solving the questions.
+Contributors: Jackson Elia, Andrew Combs
+"""
 import pyperclip
 import selenium
 import selenium.common.exceptions
@@ -22,10 +26,10 @@ class SeleniumManager:
               timeout=15):
         """
         Logs into datacamp.
-        username: Username or email for login
-        password: Corresponding password for login
-        link: The URL of the login page
-        timeout: How long before the program quits when it cannot locate an element
+        :param username: Username or email for login
+        :param password: Corresponding password for login
+        :param link: The URL of the login page
+        :param timeout: How long before the program quits when it cannot locate an element
         """
 
         self.driver.get(link)
@@ -77,7 +81,7 @@ class SeleniumManager:
     def get_solutions(self, link: str) -> list:
         """
         Uses a datacamp assignment link to get all the solutions for a chapter
-        link: The URL of the page
+        :param link: The URL of the page
         """
         self.driver.get(link)
         script = self.driver.find_element(By.XPATH, "/html/body/script[1]").get_attribute("textContent")
@@ -118,6 +122,11 @@ class SeleniumManager:
 
     # Clicks the got it button
     def solve_video_exercise(self, timeout: int) -> bool:
+        """
+        Solves a Video exercise by clicking the "Got it" button.
+        :param timeout: How long it should wait to see the "Got it" button
+        :return: Boolean for true if it successfully solved a Video exercise
+        """
         solved_exercise = False
         try:
             got_it_button = WebDriverWait(self.driver, timeout=timeout) \
@@ -132,6 +141,13 @@ class SeleniumManager:
 
     # Clicks on the python script, doing ctrl + a, inputting the solution, clicking the next button
     def solve_normal_exercise(self, solution: str, timeout: int) -> bool:
+        """
+        Solves a Normal Exercise by pasting the solution into the editor tab, clicking the "Submit Answer" button and
+        then clicking the "Continue" button.
+        :param solution: The correct answer to the current Normal Exercise
+        :param timeout: How long it should wait to sees certain elements in the normal exercise
+        :return: Boolean for true if it successfully solved a normal exercise
+        """
         solved_exercise = False
         try:
             xp_amount = WebDriverWait(self.driver, timeout=timeout) \
@@ -182,6 +198,13 @@ class SeleniumManager:
             return solved_exercise
 
     def solve_bullet_exercises(self, solutions: [str], timeout: int) -> bool:
+        """
+        Solves a Bullet exercise by pasting the solution into the editor tab, clicking the "Submit Answer" button,
+        repeating this until it has completed all of the sub exercises, then clicking the "Continue" button.
+        :param solutions: The correct answer to the current Bullet exercise
+        :param timeout: How long it should wait to sees certain elements in the Bullet exercise
+        :return: Boolean for true if it successfully solved a Bullet exercise
+        """
         solved_exercise = False
         try:
             xp_amount = WebDriverWait(self.driver, timeout=timeout) \
@@ -241,6 +264,13 @@ class SeleniumManager:
 
     # Basically the same as bullet exercises, but the final solution works for each part
     def solve_tab_exercises(self, solutions: [str], timeout: int) -> bool:
+        """
+        Solves a Tab exercise by pasting the final solution into the editor tab, clicking the "Submit Answer" button,
+        repeating this until it has completed all of the sub exercises, then clicking the "Continue" button.
+        :param solutions: The correct answer to the current Tab exercise
+        :param timeout: How long it should wait to sees certain elements in the Tab exercise
+        :return: Boolean for true if it successfully solved a Tab exercise
+        """
         solved_exercise = False
         try:
             xp_amount = WebDriverWait(self.driver, timeout=timeout) \
@@ -293,6 +323,11 @@ class SeleniumManager:
     # There are different multiple choice problems, this one allows the user to press a number to select an answer
     # Gets the number of multiple choice options, then enters 1, 2, 3 etc and presses enter after each until it gets the right one
     def solve_multiple1(self):
+        """
+        Solves a Pure Multiple Choice exercise by sending the number that corresponds to each multiple choice option and
+        the enter key until it finds the correct answer, then it clicks the "Continue" button.
+        :return: Boolean for true if it successfully solved a Pure Multiple Choice exercise
+        """
         solved_exercise = False
         try:
             # Checks if its a multiple choice question by finding the multiple choice otions
@@ -328,6 +363,11 @@ class SeleniumManager:
     # There are different multiple choice problems, this one has the python script open with it
     # Gets how many multiple choice options there are, goes through each one checking if it is the right answer
     def solve_multiple2(self):
+        """
+        Solves a Multiple Choice exercise by going through each of the options and checking to see if it is the correct
+        one.
+        :return: Boolean for true if it successfully solved a Pure Multiple Choice exercise
+        """
         solved_exercise = False
         try:
             WebDriverWait(self.driver, 5) \
@@ -373,9 +413,6 @@ class SeleniumManager:
             return solved_exercise
 
     def solve_drag_and_drop(self):
-        pass
-
-    def solve_sequential_exercises(self):
         pass
 
 # Legacy methods
