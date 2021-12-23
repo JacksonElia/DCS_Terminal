@@ -1,5 +1,10 @@
+'''
+main.py: Responsible for all main functions and testing
+Contributors: Jackson Elia, Andrew Combs
+'''
+
 import undetected_chromedriver as uc
-from SeleniumManager import *
+from seleniummanager import *
 
 # ⬇⬇⬇ What to Change ⬇⬇⬇ Placeholder until we get the json file and user input setup
 email = "jgelia@students.chccs.k12.nc.us"
