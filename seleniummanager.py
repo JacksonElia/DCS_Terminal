@@ -9,10 +9,11 @@ import selenium.common.exceptions
 from ast import literal_eval
 from html import unescape
 from selenium.webdriver import ActionChains
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.ui import WebDriverWait
 from time import sleep
 
 
@@ -87,13 +88,6 @@ class SeleniumManager:
         script = self.driver.find_element(By.XPATH, "/html/body/script[1]").get_attribute("textContent")
         script = unescape(script)
         solutions = []
-        video_exercises = []
-        normal_exercises = []
-        tab_exercises = []
-        bullet_exercies = []
-        multiple_choice_exercises1 = []
-        multiple_choice_exercises2 = []
-        drag_and_drop_exercises = []
         exercise_dicts = []
 
         number_1_found = 0
@@ -106,19 +100,42 @@ class SeleniumManager:
                 solutions.append(solution)
                 # print(segment)
             elif 'Exercise","title","' in segment:
+                # Makes sure it only gets the full set of solutions once
                 if ',"number",1,"' in segment:
                     number_1_found += 1
                     if number_1_found > 1:
                         break
                 exercise_dict = {}
-                exercise_dict["Type"] = segment[8:segment.find('Exercise","title","') + 9]
-
+                exercise_dict["type"] = segment[8:segment.find('Exercise","title","') + 8]
+                exercise_dict["number"] = segment[segment.find(',"number",') + 10:segment.find(',"url","')]
+                exercise_dict["link"] = segment[segment.find(',"url","') + 9:segment.find('"]]')]
+                exercise_dicts.append(exercise_dict)
         return solutions
 
-    # TODO: If possible identify the exercise by the page's responses
-    # Might be easier just to try every answer
-    def get_first_solution(self, solutions: list):
-        pass
+    def reset_course(self, timeout: int):
+        """
+        Resets all progress on the Datacamp course. Used to make sure all of the solve functions work properly.
+        :param timeout: How long it should wait to see the "Got it" button
+        """
+        try:
+            course_outline_button = WebDriverWait(self.driver, timeout=timeout) \
+                .until(lambda d: d.find_element(By.XPATH, '//*[@id="root"]/div/header/div[2]/div/nav/button'))
+            course_outline_button.click()
+            print("Course outline button clicked")
+            bruh = self.driver.find_elements_by_class_name("css-1gv579o")
+            for item in bruh:
+                print(item)
+            reset_button = WebDriverWait(self.driver, timeout=timeout) \
+                .until(lambda d: d.find_element(By.CLASS_NAME, 'css-1gv579o'))
+            reset_button.click()
+            sleep(.2)
+            # Presses enter twice to deal with the popups
+            alert = Alert(self.driver)
+            alert.accept()
+            sleep(.2)
+            alert.accept()
+        except selenium.common.exceptions.TimeoutException:
+            print("One of the buttons, most likely Course Outline Button not found before timeout")
 
     # Clicks the got it button
     def solve_video_exercise(self, timeout: int) -> bool:
@@ -322,7 +339,7 @@ class SeleniumManager:
     # TODO: Optimize timeouts
     # There are different multiple choice problems, this one allows the user to press a number to select an answer
     # Gets the number of multiple choice options, then enters 1, 2, 3 etc and presses enter after each until it gets the right one
-    def solve_multiple1(self):
+    def solve_multiple1(self) -> bool:
         """
         Solves a Pure Multiple Choice exercise by sending the number that corresponds to each multiple choice option and
         the enter key until it finds the correct answer, then it clicks the "Continue" button.
@@ -362,7 +379,7 @@ class SeleniumManager:
 
     # There are different multiple choice problems, this one has the python script open with it
     # Gets how many multiple choice options there are, goes through each one checking if it is the right answer
-    def solve_multiple2(self):
+    def solve_multiple2(self) -> bool:
         """
         Solves a Multiple Choice exercise by going through each of the options and checking to see if it is the correct
         one.
@@ -412,8 +429,37 @@ class SeleniumManager:
             print("Radio input button not found, most likely not a multiple choice exercise")
             return solved_exercise
 
-    def solve_drag_and_drop(self):
-        pass
+    # TODO: Make drag and drop work
+    def solve_drag_and_drop(self, timeout: int) -> bool:
+        """
+        Skips drag and drop by showing answer, clicking submit answer, and clicking continue.
+        :param timeout: How long it should wait to sees certain elements in the drag and drop exercise
+        :return:
+        """
+        solved_exercise = False
+        try:
+            show_hint_button = WebDriverWait(self.driver, timeout=timeout) \
+                .until(lambda d: d.find_element(By.XPATH,
+                                                '//*[@id="root"]/div/main/div[2]/div/div[1]/section/div[1]/div[5]/div/section/nav/div/button'))
+            show_hint_button.click()
+            show_answer_button = WebDriverWait(self.driver, timeout=timeout) \
+                .until(lambda d: d.find_element(By.XPATH,
+                                                '//*[@id="root"]/div/main/div[2]/div/div[1]/section/div[1]/div[5]/div/section/nav/div/button'))
+            show_answer_button.click()
+            submit_answer_button = WebDriverWait(self.driver, timeout=timeout) \
+                .until(lambda d: d.find_element(By.XPATH,
+                                                '//*[@id="root"]/div/main/div[2]/div/div[3]/div/div/div[2]/div/button[2]'))
+            '//*[@id="root"]/div/main/div[2]/div/div[1]/section/div[1]/div[5]/div/section/nav/div/button'
+            submit_answer_button.click()
+            continue_button = WebDriverWait(self.driver, timeout=timeout) \
+                .until(lambda d: d.find_element(By.XPATH,
+                                                '//*[@id="root"]/div/main/div[2]/div/div[1]/div/div/div/div[2]/button'))
+            continue_button.click()
+            solved_exercise = True
+            return solved_exercise
+        except selenium.common.exceptions.TimeoutException:
+            print("One of the buttons not found before timeout, most likely was not a drag and drop exercise")
+            return solved_exercise
 
 # Legacy methods
 # def get_page_source(driver: selenium.webdriver, link: str) -> str:
