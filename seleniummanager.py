@@ -83,6 +83,16 @@ class SeleniumManager:
         script = self.driver.find_element(By.XPATH, "/html/body/script[1]").get_attribute("textContent")
         script = unescape(script)
         solutions = []
+        video_exercises = []
+        normal_exercises = []
+        tab_exercises = []
+        bullet_exercies = []
+        multiple_choice_exercises1 = []
+        multiple_choice_exercises2 = []
+        drag_and_drop_exercises = []
+        exercise_dicts = []
+
+        number_1_found = 0
         for segment in script.split(",["):
             if ',"solution",' in segment and '"type","NormalExercise","id"' in segment:
                 # Slices solution from src code
@@ -91,6 +101,14 @@ class SeleniumManager:
                 solution = literal_eval('"' + unescape(literal_eval('"' + solution + '"')) + '"')
                 solutions.append(solution)
                 # print(segment)
+            elif 'Exercise","title","' in segment:
+                if ',"number",1,"' in segment:
+                    number_1_found += 1
+                    if number_1_found > 1:
+                        break
+                exercise_dict = {}
+                exercise_dict["Type"] = segment[8:segment.find('Exercise","title","') + 9]
+
         return solutions
 
     # TODO: If possible identify the exercise by the page's responses
@@ -163,62 +181,112 @@ class SeleniumManager:
             print("Submit Answer or Continue button not found, most likely not a normal exercise")
             return solved_exercise
 
-    def solve_tab_exercises(self, solutions: [str], timeout: int):
+    def solve_bullet_exercises(self, solutions: [str], timeout: int) -> bool:
         solved_exercise = False
         try:
             xp_amount = WebDriverWait(self.driver, timeout=timeout) \
                 .until(lambda d: d.find_element(By.XPATH,
                                                 '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[1]/div/div/strong'))
             # TODO: Find better way of doing this, won't always work
-            if xp_amount.text != "100 XP":
-                number_of_exercises = (WebDriverWait(self.driver, timeout=timeout)
-                                       .until(lambda d: d.find_element(By.XPATH,
-                                                                       '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[1]/div/div/h5'))).text[-1]
-                if len(solutions) == int(number_of_exercises):
-                    for solution in solutions:
-                        script_margin = WebDriverWait(self.driver, timeout=timeout) \
-                            .until(lambda d: d.find_element(By.XPATH,
-                                                            '//*[@id="rendered-view"]/div/div/div[3]/div[1]'))
-                        # Clicks on the script to put it in focus
-                        script_margin.click()
-
-                        sleep(1)  # Might not be necessary, doesn't select everything
-
-                        action_chain = ActionChains(self.driver)
-
-                        # Sends CTRL + A
-                        action_chain.key_down(Keys.CONTROL).send_keys("a").key_up(Keys.CONTROL).perform()
-                        # Types the solution
-                        # Doesn't always work because it is too slow and messes up with Datacamps's autocomplete
-                        # action_chain.send_keys(solution).perform()
-                        # Copies the solution to clipboard
-                        pyperclip.copy(solution)
-                        # Pastes the solution
-                        # TODO: Make it work for OSX
-                        action_chain.key_down(Keys.CONTROL).send_keys("v").key_up(Keys.CONTROL).perform()
-                        submit_answer_button = WebDriverWait(self.driver, timeout=timeout) \
-                            .until(lambda d: d.find_element(By.XPATH,
-                                                            '//*[@id="gl-editorTabs-files/script.py"]/div/div/div[2]/div[2]/button[3]'))
-                        sleep(3)  # Might not be necessary
-                        submit_answer_button.click()
-                        print("Submit Answer button clicked")
-                        # Clears clipboard
-                        pyperclip.copy("")
-
-                    continue_button = WebDriverWait(self.driver, timeout=3) \
+            number_of_exercises = (WebDriverWait(self.driver, timeout=timeout)
+                                   .until(lambda d: d.find_element(By.XPATH,
+                                                                   '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[1]/div/div/h5'))).text[-1]
+            if xp_amount.text != "100 XP" and len(solutions) == int(number_of_exercises):
+                for solution in solutions:
+                    script_margin = WebDriverWait(self.driver, timeout=timeout) \
                         .until(lambda d: d.find_element(By.XPATH,
-                                                        '//*[@id="gl-aside"]/div/aside/div[2]/div/div[3]/button'))
-                    continue_button.click()
-                    print("Clicked the continue button")
-                    solved_exercise = True
-                    return solved_exercise
+                                                        '//*[@id="rendered-view"]/div/div/div[3]/div[1]'))
+                    # Clicks on the script to put it in focus
+                    script_margin.click()
+
+                    sleep(1)  # Might not be necessary, doesn't select everything
+
+                    action_chain = ActionChains(self.driver)
+
+                    # Sends CTRL + A
+                    action_chain.key_down(Keys.CONTROL).send_keys("a").key_up(Keys.CONTROL).perform()
+                    # Types the solution
+                    # Doesn't always work because it is too slow and messes up with Datacamps's autocomplete
+                    # action_chain.send_keys(solution).perform()
+                    # Copies the solution to clipboard
+                    pyperclip.copy(solution)
+                    # Pastes the solution
+                    # TODO: Make it work for OSX
+                    action_chain.key_down(Keys.CONTROL).send_keys("v").key_up(Keys.CONTROL).perform()
+
+                    submit_answer_button = WebDriverWait(self.driver, timeout=timeout) \
+                        .until(lambda d: d.find_element(By.XPATH,
+                                                        '/html/body/div[1]/div/main/div[1]/div/div/div[3]/div[1]/div/div[2]/div/div/div/div/div/div[2]/div[2]/button[3]'))
+                    sleep(4)  # Might not be necessary
+                    submit_answer_button.click()
+                    print("Submit Answer button clicked")
+                    # Clears clipboard
+                    pyperclip.copy("")
+
+                continue_button = WebDriverWait(self.driver, timeout=3) \
+                    .until(lambda d: d.find_element(By.XPATH,
+                                                    '//*[@id="gl-aside"]/div/aside/div[2]/div/div[3]/button'))
+                continue_button.click()
+                print("Clicked the continue button")
+                solved_exercise = True
+                return solved_exercise
             else:
-                print("Maybe not a tab exercise")
+                print("Maybe not a bullet exercise")
                 return solved_exercise
         except selenium.common.exceptions.ElementNotInteractableException:
             print("Continue button couldn't be clicked")
         except selenium.common.exceptions.TimeoutException:
-            print("Python script not found, most likely not a tab exercise")
+            print("Python script not found, most likely not a bullet exercise")
+            return solved_exercise
+
+    # Basically the same as bullet exercises, but the final solution works for each part
+    def solve_tab_exercises(self, solutions: [str], timeout: int) -> bool:
+        solved_exercise = False
+        try:
+            xp_amount = WebDriverWait(self.driver, timeout=timeout) \
+                .until(lambda d: d.find_element(By.XPATH,
+                                                '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[1]/div/div/strong'))
+            number_of_exercises = (WebDriverWait(self.driver, timeout=timeout)
+                                   .until(lambda d: d.find_element(By.XPATH,
+                                                                   '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[1]/div/div/h5'))).text[-1]
+            if xp_amount.text != "100 XP" and len(solutions) == int(number_of_exercises):
+                # Copies the solution to clipboard
+                pyperclip.copy(solutions[-1])
+                for i in range(len(solutions)):
+                    script_margin = WebDriverWait(self.driver, timeout=timeout) \
+                        .until(lambda d: d.find_element(By.XPATH,
+                                                        '//*[@id="rendered-view"]/div/div/div[3]/div[1]'))
+                    # Clicks on the script to put it in focus
+                    script_margin.click()
+                    sleep(1)  # Might not be necessary, doesn't select everything
+                    action_chain = ActionChains(self.driver)
+                    # Sends CTRL + A
+                    action_chain.key_down(Keys.CONTROL).send_keys("a").key_up(Keys.CONTROL).perform()
+                    # Pastes the solution
+                    action_chain.key_down(Keys.CONTROL).send_keys("v").key_up(Keys.CONTROL).perform()
+                    submit_answer_button = WebDriverWait(self.driver, timeout=timeout) \
+                        .until(lambda d: d.find_element(By.XPATH,
+                                                        '/html/body/div[1]/div/main/div[1]/div/div/div[3]/div[1]/div/div[2]/div/div/div/div/div/div[2]/div[2]/button[3]'))
+                    sleep(4)  # Might not be necessary
+                    submit_answer_button.click()
+                    print("Submit Answer button clicked")
+                    # Clears clipboard
+                    pyperclip.copy("")
+
+                continue_button = WebDriverWait(self.driver, timeout=3) \
+                    .until(lambda d: d.find_element(By.XPATH,
+                                                    '//*[@id="gl-aside"]/div/aside/div[2]/div/div[3]/button'))
+                continue_button.click()
+                print("Clicked the continue button")
+                solved_exercise = True
+                return solved_exercise
+            else:
+                print("Maybe not a bullet exercise")
+                return solved_exercise
+        except selenium.common.exceptions.ElementNotInteractableException:
+            print("Continue button couldn't be clicked")
+        except selenium.common.exceptions.TimeoutException:
+            print("Python script not found, most likely not a bullet exercise")
             return solved_exercise
 
     # TODO: Optimize timeouts
