@@ -17,13 +17,7 @@ class DTheme(object):
         self.default = default  # (input symbol, input text, default text)
         self.log = log  # (brackets, info, message)
         self.error = error  # (header, main message, secondary)
-        self.syntax = syntax  # (keywords, comments, functions/classes, symbols, quotes)
-        return
-
-        
-class DSettings(object):
-    def __init__(self):
-        self.verbose = 1  # How extensive the logging is (0-2)
+        self.syntax = syntax  # (keywords, comments, builtin types, symbols, quotes)
         return
 
 # Pain
@@ -77,14 +71,11 @@ class DColors(object):
         color = (f"\033[48;2;{r};{g};{b}m" if bg else f"\033[38;2;{r};{g};{b}m")
         return color
 
-
-# TODO: use this https://www.lihaoyi.com/post/BuildyourownCommandLinewithANSIescapecodes.html
 # TODO: actually code, better function explanations
 class DTerminal(object):
 
-    def __init__(self, theme: DTheme, settings: DSettings):
+    def __init__(self, theme: DTheme):
         self.theme = theme
-        self.settings = settings
         
         self.buffer = []
         
@@ -107,11 +98,11 @@ class DTerminal(object):
 """
         print(self.theme.default[2] + title + DColors.reset)
         
-    def cloc(self, x: int, y: int):
+    def cloc(self, x: int, y: int) -> str:
         """
         Changes cursor location.
         """
-        print(f"\033[{y};{x}H")
+        return f"\033[{y};{x}H"
     
     # Prompts user input
     def prompt(self) -> str:
@@ -146,11 +137,70 @@ class DTerminal(object):
         return
     
     # Draws a sprite at a location
-    def sprite_draw(self, x: int, y: int, sprite: list):
+    def sprite_draw(self, x: int, y: int, sprite: list, style=""):
+        for i, line in enumerate(sprite):
+            print(style+self.cloc(x=x, y=(y+i))+line)
         return
         
+    # Syntax highlighting for basic python
+    # TODO: fix comment bug (seen in example)
+    # TODO: highlight via sectioning rather than replacing
+    # step through the code and look for starters, such as quotes comments or function definitions, then section them accordingly to highly them seperately and then recombine
+    def syntax_highlight(self, code: str, background=""):
+        keywords = ["def", "for", "in", "class", "return", "pass", "continue", "if", "else", "try", "except", "match", "case"]
+        symbols = ["{","}","(",")",",",":","=","+","-","/","*"] # Square brackets arent included because they break the escape codes
+        rst = DColors.reset
+        syntax = self.theme.syntax
+        
+        formatted = code.replace("\n", f"{rst}\n")
+        
+        for word in keywords:
+            formatted = formatted.replace(f"{word} ", f"{syntax[0]}{word}{rst} ")
+            formatted = formatted.replace(f"{word}\n", f"{syntax[0]}{word}{rst}\n")
+        for symbol in symbols:
+            formatted = formatted.replace(symbol, f"{syntax[3]}{symbol}{rst}")
+ 
+        search = [0, 0]
+        start = True
+        
+        while search[0] != -1:
+        
+            # time.sleep(0.1)
+            search[0] = formatted[search[1]:].find('"')
+            if search[0] == -1: break
+            
+            # print("\n" + str(start))
+            # print(formatted[search[1]:] + "\n")
+            
+            search[1] += search[0]+1
+            
+            if start:
+                formatted = formatted[:search[1]-1] + syntax[4] + formatted[search[1]-1:] 
+                search[1] += len(syntax[4])
+            else:
+                formatted = formatted[:search[1]] + rst + formatted[search[1]:]
+                search[1] += len(rst)
+                
+            start = not start
+            
+            
+        formatted = formatted.replace("#", f"{syntax[1]}#")
+        
+        return formatted
+    
+        
     # Draws a block of code with syntax highlighting
-    def code_block(self, x: int, y: int, block: list):
+    def code_block(self, x: int, y: int, block: str):
+        block = self.syntax_highlight(block)
+        code = block.split("\n")
+        self.sprite_draw(x, y, code)
+        return
+        
+    # Main code
+    def begin(self):
+        return
+        
+    def end(self):
         return
 
 
@@ -161,20 +211,35 @@ def main():
     default = (DColors.green+DColors.bold+DColors.reverse, DColors.bwhite, DColors.green)
     log = (DColors.yellow, DColors.red, DColors.bwhite)
     error = (DColors.red+DColors.bold+DColors.reverse, DColors.bred, DColors.rgb(200,70,70))
-    syntax = ()
+    syntax = (DColors.green, DColors.blue, DColors.cyan, DColors.yellow, DColors.bred)
     
     theme = DTheme(default, log, error, syntax)
-    settings = DSettings()
-    terminal = DTerminal(theme=theme, settings=settings)
+    terminal = DTerminal(theme=theme)
     
-    terminal.startup() 
-    inp = terminal.prompt()
-    terminal.disp("Displaying necessary information\n")
-    terminal.log("Logging data that requires timing (or it should just look fancy)\n")
-    terminal.error("Generalized error message or type.", "Case specific explanation and example of better use.")
+    sprite = [
+        " ###",
+        "# # #",
+        " ###"
+    ]
+    
+    # terminal.startup() 
+    # terminal.disp("Displaying necessary information\n")
+    # terminal.log("Logging data that requires timing (or it should just look fancy)\n")
+    # terminal.error("Generalized error message or type.", "Case specific explanation and example of better use.")
+    # terminal.sprite_draw(25, 25, sprite=sprite)
+    
+    code = """
+# defining your function
+def myfunction(param1: str, param2: int):
+    param2 *= 5
+    print("Here's your string " + param1)
+    return param2
+    
+    """
+    
+    terminal.code_block(5, 5, code)
 
     
 
 if __name__ == "__main__":
     main()
-    # print(DColors.rgb(15, 15, 15, bg=True))
