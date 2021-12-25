@@ -12,7 +12,6 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
 from time import sleep
 
@@ -404,6 +403,12 @@ class SeleniumManager:
             print("One of the buttons not found before timeout, most likely was not a drag and drop exercise")
 
     def click_submit(self, timeout: int, xpath="//button[contains(@data-cy,'submit-button')]") -> bool:
+        """
+        Clicks the submit button for an exercise.
+        :param timeout: How long it should wait to find the submit button
+        :param xpath: The xpath of the submit button, default value should work for all of them
+        :return: A boolean for if it successfully clicked the submit button
+        """
         try:
             WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, xpath)).click()
             print("Clicked the Submit button")
@@ -416,6 +421,12 @@ class SeleniumManager:
             return False
 
     def click_continue(self, xpath: str, timeout: int) -> bool:
+        """
+        Clicks the continue button for an exercise and deals with the randomly occurring full page continue button.
+        :param timeout: How long it should wait to find the continue button
+        :param xpath: The xpath of the continue button
+        :return: A boolean for if it successfully clicked the continue button
+        """
         try:
             WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, xpath)).click()
             print("Clicked the Continue button")
