@@ -51,7 +51,7 @@ class SeleniumManager:
 
         # Next button click
         self.driver.find_element(By.XPATH, '//*[@id="new_user"]/button').click()
-        sleep(0.2)  # Might not be necessary
+        sleep(1)  # Might not be necessary
         print("Clicked Next")
 
         # Password find and enter
@@ -163,15 +163,18 @@ class SeleniumManager:
                     self.solve_drag_and_drop(timeout)
                 case _:
                     print("What entered was an exercise not on this match statement")
-        try:
-            chapter_popup_x = WebDriverWait(self.driver, timeout=timeout) \
-                .until(lambda d: d.find_element(By.CLASS_NAME, "css-eafjsu"))
-            chapter_popup_x.click()
-            # Waiting for next chapter to load
-            sleep(timeout)
+        # For some reason the continue button sometimes doesn't click on the last exercise
+        # TODO: Find out why and fix
+        self.driver.refresh()
+        sleep(1)
+        WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, "//body")).click()
+        ActionChains(self.driver).key_down(Keys.CONTROL).send_keys("k").key_up(Keys.CONTROL).perform()
+        print("Sent ctrl + k")
+        # Waiting for next chapter to load
+        sleep(timeout)
+        if "https://app.datacamp.com/learn/courses" not in self.driver.current_url:
             return True, self.driver.current_url
-        except selenium.common.exceptions.TimeoutException:
-            print("Couldn't find the popup, most likely finished the course")
+        else:
             return False, ""
 
     def reset_course(self, timeout: int):
@@ -185,16 +188,19 @@ class SeleniumManager:
             course_outline_button.click()
             print("Course outline button clicked")
             reset_button = WebDriverWait(self.driver, timeout=timeout) \
-                .until(lambda d: d.find_element(By.CLASS_NAME, "css-1gv579o"))
-            self.driver.execute_script("arguments[0].click();", reset_button)
+                .until(lambda d: d.find_element(By.XPATH, "//button[contains(@data-cy,'outline-reset')]"))
+            # Several errors can happen with the rest button loading differently
+            try:
+                reset_button.click()
+            except selenium.common.exceptions.ElementClickInterceptedException:
+                self.driver.execute_script("arguments[0].click();", reset_button)
             sleep(.2)
             # Presses enter twice to deal with the popups
-            alert = Alert(self.driver)
-            alert.accept()
+            Alert(self.driver).accept()
             sleep(.2)
-            alert.accept()
+            Alert(self.driver).accept()
         except selenium.common.exceptions.TimeoutException:
-            print("One of the buttons, most likely Course Outline Button not found before timeout")
+            print("The Course Outline Button was not found before timeout")
 
     # Clicks the got it button
     def solve_video_exercise(self, timeout: int):
@@ -407,10 +413,10 @@ class SeleniumManager:
         # Gets the amount of the child elements (the multiple choice options) in the parent element
         multiple_choice_options = len(self.driver.find_elements_by_xpath(
             '//*[@id="root"]/div/main/div[1]/section/div/div[5]/div/div/ul/*'))
-        print(multiple_choice_options)
-        for i in range(0, multiple_choice_options):
+        for i in range(multiple_choice_options):
             ActionChains(self.driver).send_keys(str(i + 1), Keys.ENTER).perform()
-            self.click_continue(xpath="//button[contains(@data-cy,'completion-pane-continue-button')]", timeout=timeout)
+            if self.click_continue(xpath="//button[contains(@data-cy,'completion-pane-continue-button')]", timeout=timeout):
+                break
             sleep(1)  # Might not be necessary
 
     # There are different multiple choice problems, this one has the editor tab open with it
@@ -442,7 +448,8 @@ class SeleniumManager:
                     .until(lambda d: d.find_element(By.XPATH,
                                                     '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[2]/div/div/div[2]/div/div[1]/button'))
                 submit_button.click()
-                self.click_continue(xpath="//button[contains(@data-cy,'next-exercise-button')]", timeout=timeout)
+                if self.click_continue(xpath="//button[contains(@data-cy,'next-exercise-button')]", timeout=timeout):
+                    break
             except selenium.common.exceptions.ElementNotInteractableException:
                 print("Submit answer button or radio button couldn't be clicked")
             except selenium.common.exceptions.TimeoutException:
@@ -476,15 +483,16 @@ class SeleniumManager:
         except selenium.common.exceptions.TimeoutException:
             print("One of the buttons not found before timeout, most likely was not a drag and drop exercise")
 
-    def click_continue(self, xpath: str, timeout: int):
+    def click_continue(self, xpath: str, timeout: int) -> bool:
         try:
             continue_button = WebDriverWait(self.driver, timeout=timeout) \
                 .until(lambda d: d.find_element(By.XPATH, xpath))
             continue_button.click()
             print("Clicked the continue button")
-            return
+            return True
         except selenium.common.exceptions.ElementNotInteractableException:
             print("Continue button couldn't be clicked")
+            return False
         except selenium.common.exceptions.TimeoutException:
             try:
                 continue_button = WebDriverWait(self.driver, timeout=2) \
@@ -492,57 +500,10 @@ class SeleniumManager:
                                                     '//*[@id="root"]/div/main/div[2]/div/div/div[3]/button'))
                 continue_button.click()
                 print("Clicked the continue button")
-                return
+                return True
             except selenium.common.exceptions.ElementNotInteractableException:
                 print("Continue button couldn't be clicked")
+                return False
             except selenium.common.exceptions.TimeoutException:
                 print("Continue button not found")
-
-# Legacy methods
-# def get_page_source(driver: selenium.webdriver, link: str) -> str:
-#     '''
-#     Returns the full HTML page source of a given link.
-#     driver: Any selenium webdriver
-#     link: The URL of the page
-#     '''
-#     driver.get(link)
-#     return driver.page_source
-
-# def get_page_ids(self, link: str) -> list:
-#     '''
-#     Uses a datacamp assignment link to get all the required IDs for an API lookup
-#     driver: Any selenium webdriver
-#     link: The URL of the page
-#     '''
-#     self.driver.get(link)
-#
-#     script = self.driver.find_element(By.XPATH, "/html/body/script[1]").get_attribute("textContent")
-#     script = html.unescape(script)
-#     ids = []
-#     for p in script.split("],"):
-#         if '"NormalExercise",' in p and '"id",' in p:
-#             i_start = p.find('"id",') + 5
-#             i_end = p[i_start:].find(",")
-#             if i_end == -1: i_end = p[i_start:].find("]")
-#             id = p[i_start:i_end + i_start]
-#             ids.append(int(id))
-#
-#     return list(np.unique(ids))
-#
-# def api_lookup(self, ids: list,
-#                api_link="https://campus-api.datacamp.com/api/exercises/{}/get_solution") -> list:
-#     '''
-#     Looks up a list of IDs and returns the API solution.
-#     driver: Any selenium webdriver
-#     ids: All IDs that will be looked up
-#     api_link: A formattable string with place for an ID
-#     '''
-#     pages = []
-#     for id in ids:
-#         self.driver.get(api_link.format(id))
-#         source = self.driver.find_element(By.XPATH, "/html/body/pre")
-#         element = literal_eval(source.get_attribute("textContent"))
-#         solution = html.unescape(element["solution"])
-#         pages.append(solution)
-#
-#     return pages
+                return False
