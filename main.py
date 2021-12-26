@@ -1,17 +1,17 @@
-'''
+"""
 main.py: Responsible for all main functions and testing
 Contributors: Jackson Elia, Andrew Combs
-'''
+"""
 
-import undetected_chromedriver as uc
-from seleniummanager import SeleniumManager
 from parser import Parser
 from terminal import DTerminal, DColors, DTheme
 
 # ⬇⬇⬇ What to Change ⬇⬇⬇ Placeholder until we get the json file and user input setup
 email = "jgelia@students.chccs.k12.nc.us"
-password = "lol"
-link = "https://campus.datacamp.com/courses/joining-data-with-pandas/data-merging-basics?ex=7"
+password = "sfjle"
+link = "https://campus.datacamp.com/courses/joining-data-in-sql/set-theory-clauses?ex=14"
+reset_course = False
+wait_length = 0
 # ⬆⬆⬆ What to Change ⬆⬆⬆
 
 
@@ -64,6 +64,10 @@ def main():
     #
     # driver = uc.Chrome(options=options)
 
+    options = uc.ChromeOptions()
+    options.add_experimental_option("prefs", {"credentials_enable_service": False, "profile": {"password_manager_enabled": False}})
+
+    driver = uc.Chrome(options=options)
     driver = uc.Chrome()
 
     selenium_manager = SeleniumManager(driver)
@@ -86,6 +90,7 @@ print(sorted_df.head())"""
     sleep(100)
     driver.quit()  # Necessary for proper closing of driver, will leave a footprint in ram otherwise
     '''
+
 
 if __name__ == "__main__":
     main()
