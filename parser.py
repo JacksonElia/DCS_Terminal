@@ -16,15 +16,16 @@ class Parser(object):
         for command in commands:
             self.add_command(*command)
 
-    def add_command(self, command: str, function: types.FunctionType, args: list, flags: list):
+    def add_command(self, command: str, function: types.FunctionType, args: list, flags: list, defkwargs: dict):
         """
         Adds a command to the parser's local dictionary.
         command [str]: The name of the argument
         function [function]: The function the command passes arguments for
         args [list]: A list of types in order of how arguments should be passed
         flags [list]: A list of strings containing the name of boolean flag values
+        defkwargs [dict]: All the default arguments that should be filled in to the function (must come last)
         """
-        self.lookup[command] = (function, args, flags)
+        self.lookup[command] = (function, args, flags, defkwargs)
 
     # TODO: Make code more readable
     def parse(self, given: str) -> tuple:
@@ -36,7 +37,7 @@ class Parser(object):
         nodes = [n for n in nodes if n]
 
         cmd = nodes[0]
-        if cmd not in self.lookup.keys(): return "ERROR", "COMMAND NOT FOUND", f"{cmd} DOES NOT EXIST"
+        if cmd not in self.lookup.keys(): return "ERROR", "COMMAND NOT FOUND", f"'{cmd}' DOES NOT EXIST"
         func = self.lookup[cmd]
 
         args = nodes[1:]
@@ -56,7 +57,7 @@ class Parser(object):
                 return "ERROR", "MISMATCHED TYPES", f"{type(arg)} IS NOT {t}"
 
         # Parsing flags (**kwargs)
-        parsed_flags = {}
+        parsed_flags = func[3]
         for flag in flags:
             if flag in func[2]:
                 parsed_flags[flag[2:]] = True

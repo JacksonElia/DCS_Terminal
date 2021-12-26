@@ -5,7 +5,6 @@ Contributors: Andrew Combs
 
 import os
 import sys
-import keyboard
 from datetime import datetime
 import time
 import random
@@ -73,30 +72,19 @@ class DColors(object):
 
 # TODO: actually code, better function explanations
 class DTerminal(object):
-
+    
+    def clear(self):
+        os.system("cls" if os.name == "nt" else "clear")
+        
     def __init__(self, theme: DTheme):
         self.theme = theme
         
         self.buffer = []
         
         # for windows this is required to get escape codes to work
-        os.system("cls" if os.name == "nt" else "clear")
+        self.clear()
         
         return
-        
-    def startup(self):
-        """
-        Purely visual thing, just because it looks cool
-        """
-        title = """
-888888ba   a88888b. .d88888b     d888888P                              oo                   dP 
-88    `8b d8'   `88 88.    "'       88                                                      88 
-88     88 88        `Y88888b.       88    .d8888b. 88d888b. 88d8b.d8b. dP 88d888b. .d8888b. 88 
-88     88 88              `8b       88    88ooood8 88'  `88 88'`88'`88 88 88'  `88 88'  `88 88 
-88    .8P Y8.   .88 d8'   .8P       88    88.  ... 88       88  88  88 88 88    88 88.  .88 88 
-8888888P   Y88888P'  Y88888P        dP    `88888P' dP       dP  dP  dP dP dP    dP `88888P8 dP 
-"""
-        print(self.theme.default[2] + title + DColors.reset)
         
     def cloc(self, x: int, y: int) -> str:
         """
@@ -114,9 +102,11 @@ class DTerminal(object):
         return inp
     
     # Prints at a location
-    def disp(self, message: str):
+    # TODO: UPDATE ALL THE OTHER FUNCTIONS SO THAT DEFAULT PARAMETERS AND FUNCTIONS ARE THERE
+    def disp(self, title: str, message: str):
         dft = self.theme.default
         rst = DColors.reset
+        if str != "": print(f"{dft[2]}{DColors.reverse}{title}{rst}")
         print(f"{dft[2]}{message}{rst}")
         return
     
@@ -129,11 +119,11 @@ class DTerminal(object):
         print(f"{rst+log[0]}[{rst+log[1]}{now.hour}:{now.minute}:{now.second}{rst+log[0]}]{rst}: {log[2]+message+rst}")
         return
         
-    def error(self, message: str, secondary=""):
+    def error(self, message: str, secondary: str=""):
         err = self.theme.error
         rst = DColors.reset
         print(f"{rst+err[0]}ERROR:{rst+err[1]} {message+rst}")
-        print(f"{rst+err[2]+str(secondary)+rst}")
+        print(f"{rst+err[2]+str(secondary)+rst}\n")
         return
     
     # Draws a sprite at a location
@@ -187,21 +177,33 @@ class DTerminal(object):
         formatted = formatted.replace("#", f"{syntax[1]}#")
         
         return formatted
-    
         
     # Draws a block of code with syntax highlighting
     def code_block(self, x: int, y: int, block: str):
-        block = self.syntax_highlight(block)
+        # block = self.syntax_highlight(block)
         code = block.split("\n")
         self.sprite_draw(x, y, code)
         return
+    
+    # Puts a header at the top of the screen
+    def header(self, header: str, formatting: str):
+        print(f"{formatting}{self.cloc(0, 0)}{header}{self.cloc(0, 1)}{DColors.reset}\n")
         
-    # Main code
-    def begin(self):
-        return
-        
-    def end(self):
-        return
+    def startup(self):
+        """
+        Purely visual thing, just because it looks cool
+        """
+        size = os.get_terminal_size()
+        load = "Loading..."
+        print(DColors.bgreen+DColors.bold)
+        for i, c in enumerate(load):
+            print(self.cloc(int(size[0]/2)-int(len(load)/2)+i, int(size[1]/2))+c)
+            time.sleep(.1)
+            
+        time.sleep(1)
+        self.clear()
+        hcolor = DColors.rgb(20, 148, 20)
+        self.header("DCS Terminal", DColors.bold+DColors.reverse+hcolor+DColors.bg_black)
 
 
 

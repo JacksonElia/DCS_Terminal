@@ -4,7 +4,9 @@ Contributors: Jackson Elia, Andrew Combs
 '''
 
 import undetected_chromedriver as uc
-from seleniummanager import *
+from seleniummanager import SeleniumManager
+from parser import Parser
+from terminal import DTerminal, DColors, DTheme
 
 # ⬇⬇⬇ What to Change ⬇⬇⬇ Placeholder until we get the json file and user input setup
 email = "jgelia@students.chccs.k12.nc.us"
@@ -14,6 +16,45 @@ link = "https://campus.datacamp.com/courses/joining-data-with-pandas/data-mergin
 
 
 def main():
+    active=True
+    
+    # Inner functions necessary for changing internal variables:
+    def cmd_exit():
+        exit()
+        
+    def cmd_info(t: DTerminal):
+        # TODO: Store version data better
+        t.disp(title="About", message="Version: 1.0\nFunctionality: Full Auto\nAuthors: Jackson Elia, Andrew Combs\n")
+    
+    # This can be changed later
+    theme = DTheme(
+        default=(DColors.green+DColors.bold+DColors.reverse, DColors.bwhite, DColors.green),
+        log=(DColors.yellow, DColors.red, DColors.bwhite),
+        error=(DColors.red+DColors.bold+DColors.reverse, DColors.bred, DColors.rgb(200,70,70)),
+        syntax=(DColors.green, DColors.blue, DColors.cyan, DColors.yellow, DColors.bred)
+    )  
+    terminal = DTerminal(theme=theme)
+    # all commands need to be put in here
+    commands = [
+        ("exit", cmd_exit, [], [], {}),
+        ("info", cmd_info, [], [], {"t": terminal})
+    ]
+    parser = Parser(commands)
+    
+    terminal.startup()
+    
+    while active:
+        inp = terminal.prompt()
+        if inp == "": continue
+        info = parser.parse(inp)
+        if info[0] == "ERROR":
+            terminal.error(info[1], info[2])
+            continue
+            
+        parser.execute(info)
+    
+    
+    ''' This will be removed
     # This Hides the browser, *set as an option for the user to decide later
     # options = uc.ChromeOptions()
     #
@@ -44,7 +85,7 @@ print(sorted_df.head())"""
     print(*solutions)
     sleep(100)
     driver.quit()  # Necessary for proper closing of driver, will leave a footprint in ram otherwise
-
+    '''
 
 if __name__ == "__main__":
     main()
