@@ -12,6 +12,7 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from time import sleep
 
@@ -255,6 +256,7 @@ class SeleniumManager:
         self.click_submit(timeout=timeout)
         self.click_continue(xpath="//button[contains(@data-cy,'next-exercise-button')]", timeout=timeout)
 
+    # TODO: Verify answers we correct through checking for if hints are given
     def solve_bullet_exercises(self, solutions: [str], timeout: int) -> int:
         """
         Solves a Bullet exercise by pasting the solution into the editor tab, clicking the "Submit Answer" button,
@@ -271,7 +273,7 @@ class SeleniumManager:
                 script_margin = WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, '//*[@id="rendered-view"]/div/div/div[3]/div[1]'))
                 # Clicks on the script to put it in focus
                 script_margin.click()
-                sleep(2)  # Necessary for ctrl + a to select everything properly
+                sleep(3)  # Necessary for ctrl + a to select everything properly
                 action_chain = ActionChains(self.driver)
                 # Sends CTRL + A
                 action_chain.key_down(Keys.CONTROL).send_keys("a").key_up(Keys.CONTROL).perform()
@@ -334,7 +336,7 @@ class SeleniumManager:
                     solutions_used += 1
                     # Clicks on the script to put it in focus
                     script_margin.click()
-                    sleep(2)  # Necessary, selects things incorrectly if this isn't 2 seconds
+                    sleep(3)  # Necessary, selects things incorrectly if this isn't 2 seconds
                     action_chain = ActionChains(self.driver)
                     # Sends CTRL + A
                     action_chain.key_down(Keys.CONTROL).send_keys("a").key_up(Keys.CONTROL).perform()
@@ -352,7 +354,7 @@ class SeleniumManager:
         except selenium.common.exceptions.TimeoutException:
             print("Number of exercises or Editor tab not found, most likely not a bullet exercise")
             return solutions_used
-        except ValueError:
+        except TypeError:
             print("Exercises and solving desynced, wait for restart of course")
 
     # TODO: Optimize timeouts
@@ -419,7 +421,7 @@ class SeleniumManager:
         :return: A boolean for if it successfully clicked the submit button
         """
         try:
-            WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, xpath)).click()
+            WebDriverWait(self.driver, timeout=timeout).until(EC.element_to_be_clickable((By.XPATH, xpath))).click()
             print("Clicked the Submit button")
             return True
         except selenium.common.exceptions.ElementNotInteractableException:
@@ -437,7 +439,7 @@ class SeleniumManager:
         :return: A boolean for if it successfully clicked the continue button
         """
         try:
-            WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, xpath)).click()
+            WebDriverWait(self.driver, timeout=timeout).until(EC.element_to_be_clickable((By.XPATH, xpath))).click()
             print("Clicked the Continue button")
             return True
         except selenium.common.exceptions.ElementNotInteractableException:
@@ -445,7 +447,7 @@ class SeleniumManager:
             return False
         except selenium.common.exceptions.TimeoutException:
             try:
-                WebDriverWait(self.driver, timeout=2).until(lambda d: d.find_element(By.XPATH, '//*[@id="root"]/div/main/div[2]/div/div/div[3]/button')).click()
+                WebDriverWait(self.driver, timeout=2).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div/main/div[2]/div/div/div[3]/button'))).click()
                 print("Clicked the continue button")
                 return True
             except selenium.common.exceptions.ElementNotInteractableException:
