@@ -136,16 +136,19 @@ class SeleniumManager:
             done_with_course = not next_chapter
 
     # TODO: Let user set how long in between solving
-    def auto_solve_chapter(self, exercise_list: [dict], solutions: [str], timeout=10) -> (bool, str):
+    def auto_solve_chapter(self, exercise_list: [dict], solutions: [str], wait_length=0, timeout=10) -> (bool, str):
         """
         Automatically solves a Datacamp chapter, if it desyncs it will redo the chapter.
         :param exercise_list: List of dicts that contain information about each exercise
         :param solutions: List of solutions for each exercises
+        :param wait_length: Delay in between exercises
         :param timeout: How long it waits for elements to appear
         :return: A boolean for if there is another chapter in the course and a string with the url to that chapter
         """
         self.driver.get(exercise_list[0]["link"])
         for exercise in exercise_list:
+            # User can set this to add delay in between exercises
+            sleep(wait_length)
             match exercise["type"]:
                 case "VideoExercise":
                     print("Solving Video Exercise")
@@ -177,11 +180,13 @@ class SeleniumManager:
                     print("What entered was an exercise not on this match statement")
         # Refreshes the page to deal with popup
         self.driver.refresh()
-        sleep(1)
-        # Clicks on the page, then enters in shortcut for the arrow button at the top
-        WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, "//body")).click()
-        ActionChains(self.driver).key_down(Keys.CONTROL).send_keys("k").key_up(Keys.CONTROL).perform()
-        print("Sent ctrl + k")
+        if exercise_list[-1]["type"] == "VideoExercise":
+            self.click_submit(timeout)
+        else:
+            # Clicks on the page, then enters in shortcut for the arrow button at the top
+            WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, "//body")).click()
+            ActionChains(self.driver).key_down(Keys.CONTROL).send_keys("k").key_up(Keys.CONTROL).perform()
+            print("Sent ctrl + k")
         # Waiting for next chapter to load
         sleep(timeout)
         if "https://app.datacamp.com/learn/courses" not in self.driver.current_url:
@@ -285,6 +290,8 @@ class SeleniumManager:
         except selenium.common.exceptions.TimeoutException:
             print("Editor tab timed out, most likely not a bullet exercise")
             return solutions_used
+        except TypeError:
+            print("Exercises and solving desynced, wait for restart of course")
 
     def solve_tab_exercises(self, solutions: [str], timeout: int) -> int:
         """
@@ -345,6 +352,8 @@ class SeleniumManager:
         except selenium.common.exceptions.TimeoutException:
             print("Number of exercises or Editor tab not found, most likely not a bullet exercise")
             return solutions_used
+        except ValueError:
+            print("Exercises and solving desynced, wait for restart of course")
 
     # TODO: Optimize timeouts
     def solve_multiple1(self, timeout: int):
