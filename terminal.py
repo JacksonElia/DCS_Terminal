@@ -118,7 +118,7 @@ class DTerminal(object):
         rst = DColors.reset
         now = datetime.now()
         # TODO: find a better way of doing this
-        print(f"{rst+log[0]}[{rst+log[1]}{now.hour}:{now.minute}:{now.second}{rst+log[0]}]{rst}: {log[2]+message+rst}")
+        print(f"{rst+log[0]}[{rst+log[1]}{now.hour}:{now.minute}:{now.second}{rst+log[0]}]{rst}{log[2]}: {message+rst}")
         return
         
     def error(self, message: str, secondary: str=""):
@@ -193,16 +193,13 @@ class DTerminal(object):
         
     def startup(self):
         """
-        Purely visual thing, just because it looks cool
+        Purely visual thing, just because it looks cool (MAY BECOME LEGACY)
         """
         size = os.get_terminal_size()
         load = "Loading..."
         print(DColors.bgreen+DColors.bold)
         for i, c in enumerate(load):
-            print(self.cloc(int(size[0]/2)-int(len(load)/2)+i, int(size[1]/2))+c)
-            time.sleep(.1)
-            
-        time.sleep(1)
-        self.clear()
-        hcolor = DColors.rgb(20, 148, 20)
-        self.header("DCS Terminal", DColors.bold+DColors.reverse+hcolor+DColors.bg_black)
+            print(self.cloc(1+i, 0)+c)
+            time.sleep(.02)
+
+        

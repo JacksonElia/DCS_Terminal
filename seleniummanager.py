@@ -16,7 +16,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from time import sleep
 
-
+# TODO: Integrate terminal instead of using print
 class SeleniumManager:
     driver: selenium.webdriver
 
@@ -48,6 +48,7 @@ class SeleniumManager:
             # Next button click
             WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, '//*[@id="new_user"]/button')).click()
             # Password find and enter
+            sleep(1)
             try:
                 WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.ID, "user_password")).send_keys(password)
                 print("Password Entered")
