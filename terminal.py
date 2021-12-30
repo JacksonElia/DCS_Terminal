@@ -107,8 +107,8 @@ class DTerminal(object):
         dft = self.theme.default
         rst = DColors.reset
         # this is probably a bad solution
-        filler = " "*(os.get_terminal_size()[0]-len(title))
-        if str != "": print(f"{dft[2]}{DColors.reverse}{title}{filler}{rst}")
+        # filler = " "*(os.get_terminal_size()[0]-len(title))
+        if str != "": print(f"{dft[2]}{DColors.reverse}{title}{rst}")
         print(f"{dft[2]}{message}{rst}")
         return
     

@@ -77,7 +77,10 @@ class Parser(object):
 
         # Actual error logging needed here
         if cmd == "ERROR": return info
-        if cmd not in self.lookup.keys(): return "ERROR", "COMMAND NOT FOUND", f"{cmd} DOES NOT EXIST"
-
+        if cmd not in self.lookup.keys(): return ("ERROR", "COMMAND NOT FOUND", f"{cmd} DOES NOT EXIST")
         func = self.lookup[cmd]
+        if len(info[1]) != len(func[1]): 
+            return ("ERROR", "INVALID NUMBER OF ARGUMENTS", f"{cmd} REQUIRES {len(func[1])} ARGUMENTS, {len(info[1])} GIVEN")
+
+        
         return func[0](*info[1], **info[2])

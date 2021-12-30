@@ -38,6 +38,24 @@ def cmd_clear(t: DTerminal):
     hcolor = DColors.rgb(20, 148, 20)
     t.header("DCS Terminal", DColors.bold+DColors.reverse+hcolor+DColors.bg_black)
 
+def cmd_help(command: str, t: DTerminal, p: Parser):
+    # Gives an type description of commands
+    if command not in p.lookup.keys():
+        t.disp("", f"Command '{command}' does not exist.")
+        return
+    
+    func = p.lookup[command]
+    title = f"Command: {command}"
+    # t.log(str(func))
+    info = ""
+    if len(func[1]) == 0:
+        info = "This command takes no arguments\n"
+    else:
+        info = f"This command takes {len(func[1])} argument(s).\nOrder: {(', '.join([str(i) for i in func[1]]))}\n"
+    t.disp(title, info)
+    return
+    
+
 # Selenium Manager shell commands
 # THIS MIGHT NOT BE A GOOD WAY TO DO IT !
 
@@ -53,6 +71,15 @@ def cmd_setcredentials(username: str, password: str, t: DTerminal, jm: JSONManag
     
     
     return
+
+def cmd_checkcredentials(t: DTerminal, jm: JSONManager, autoclear=False):
+    settings = jm.read()
+    t.log(f"Current Username: {settings['username']}")
+    t.log(f"Current Password: {settings['password']}\n")
+    if autoclear:
+        time.sleep(3)
+        cmd_clear(t)
+    
 
 def cmd_login(sm: SeleniumManager, t: DTerminal, jm: JSONManager):
     settings = jm.read()
@@ -96,9 +123,12 @@ def main():
         ("info", cmd_info, [], [], {"t": terminal, "data": settings}),
         ("clear", cmd_clear, [], [], {"t": terminal}),
         ("setcreds", cmd_setcredentials, [str, str], [], {"t": terminal, "jm": jsonmanager}),
+        ("checkcreds", cmd_checkcredentials, [], ["--autoclear"], {"t": terminal, "jm": jsonmanager}),
         ("login", cmd_login, [], [], {"sm": seleniummanager, "t": terminal, "jm": jsonmanager})
     ]
     parser = Parser(commands)
+    parser.add_command("help", cmd_help, [str], [], {"t": terminal, "p": parser})
+    
     terminal.log("Parser initialized.")
     terminal.log("Startup successful.")
     
@@ -116,7 +146,11 @@ def main():
             terminal.error(info[1], info[2])
             continue
             
-        parser.execute(info)
+        result = parser.execute(info)
+        # Rough error logging
+        if result and result[0] == "ERROR":
+            terminal.error(result[1], result[2])
+            continue
     
     
     ''' This will be removed
