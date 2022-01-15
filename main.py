@@ -19,10 +19,11 @@ from typing import Any
 # ⬇⬇⬇ What to Change ⬇⬇⬇ Placeholder until we get the json file and user input setup
 email = "jgelia@students.chccs.k12.nc.us"
 password = "sfjle"
-link = "https://campus.datacamp.com/courses/joining-data-in-sql/set-theory-clauses?ex=14"
+link = "https://campus.datacamp.com/courses/introduction-to-sql/selecting-columns?ex=11"
 reset_course = False
 wait_length = 0
 # ⬆⬆⬆ What to Change ⬆⬆⬆
+
 
 # System commands
 def cmd_exit(t: DTerminal, driver: selenium.webdriver):
@@ -30,20 +31,23 @@ def cmd_exit(t: DTerminal, driver: selenium.webdriver):
     driver.quit()
     t.log("Driver successfully quit.")
     exit()
-    
+
+
 def cmd_info(t: DTerminal, data: dict):
     # TODO: make less ugly
     t.disp(title="About", message=f"Version: {data['version']}\nFunctionality: {data['functionality']}\nAuthors: {', '.join(data['authors'])}\n")
+
 
 def cmd_clear(t: DTerminal):
     t.clear()
     hcolor = DColors.rgb(20, 148, 20)
     t.header("DCS Terminal", DColors.bold+DColors.reverse+hcolor+DColors.bg_black)
 
+
 def cmd_modify_savedata(data_name: str, new_data: object, t: DTerminal, jm: JSONManager):
     data = jm.read()
     if data_name not in data.keys():
-        return ("ERROR", "Data block not found", f'Data block "{data_name}" was not found in save file')
+        return "ERROR", "Data block not found", f'Data block "{data_name}" was not found in save file'
 
     data[data_name] = new_data
     jm.write(data)
@@ -51,12 +55,15 @@ def cmd_modify_savedata(data_name: str, new_data: object, t: DTerminal, jm: JSON
 
     return
 
-def cmd_help(command: str, t: DTerminal, p: Parser):
+
+def cmd_help(command: str, random: int, t: DTerminal, p: Parser):
     # Gives an type description of commands
     if command not in p.lookup.keys():
         t.disp("", f"Command '{command}' does not exist.")
         return
-    
+
+    t.disp("", f"Your Number: {random}")
+
     func = p.lookup[command]
     title = f"Command: {command}"
     # t.log(str(func))
@@ -71,11 +78,10 @@ def cmd_help(command: str, t: DTerminal, p: Parser):
         info += f"\nThis command takes {len(func[2])} argument(s).\n{(', '.join([str(i) for i in func[2]]))}\n"
     t.disp(title, info)
     return
-    
+
 
 # Selenium Manager shell commands
 # THIS MIGHT NOT BE A GOOD WAY TO DO IT !
-
 # TODO: add error checking and better logging
 def cmd_setcredentials(username: str, password: str, t: DTerminal, jm: JSONManager):
     settings = jm.read()
@@ -85,9 +91,9 @@ def cmd_setcredentials(username: str, password: str, t: DTerminal, jm: JSONManag
     t.log(f"Set new password: {password}")
     jm.write(settings)
     t.log("Successfully set username and password.\n")
-    
-    
+
     return
+
 
 def cmd_checkcredentials(t: DTerminal, jm: JSONManager, autoclear=False):
     settings = jm.read()
@@ -111,7 +117,6 @@ def cmd_course_autosolve(start_link: str, sm: SeleniumManager, t: DTerminal, jm:
 
 
 def main():
-    
     # TODO: make this look good
     theme = DTheme(
         default=(DColors.green+DColors.bold+DColors.reverse, DColors.bwhite, DColors.green),
@@ -134,7 +139,7 @@ def main():
         terminal.log("Chrome startup window disabled.")
         options.add_argument('--no-startup-window')
         options.add_argument('--headless')
-    # options.add_experimental_option("prefs", {"credentials_enable_service": False, "profile": {"password_manager_enabled": False}})
+    options.add_experimental_option("prefs", {"credentials_enable_service": False, "profile": {"password_manager_enabled": False}})
     driver = uc.Chrome(options=options)
     terminal.log("Chrome driver successfully created.")
     
@@ -153,7 +158,7 @@ def main():
         ("solvecourse", cmd_course_autosolve, [str], ["--autoreset"], {"sm": seleniummanager, "t": terminal, "jm": jsonmanager})
     ]
     parser = Parser(commands)
-    parser.add_command("help", cmd_help, [str], [], {"t": terminal, "p": parser})
+    parser.add_command("help", cmd_help, [str, int], [], {"t": terminal, "p": parser})
     
     terminal.log("Parser initialized.")
     terminal.log("Startup successful.")
@@ -177,44 +182,6 @@ def main():
         if result and result[0] == "ERROR":
             terminal.error(result[1], result[2])
             continue
-    
-    
-    ''' This will be removed
-    # This Hides the browser, *set as an option for the user to decide later
-    # options = uc.ChromeOptions()
-    #
-    # options.add_argument('--no-startup-window')  # Hides the window
-    # options.add_argument('--headless')  # Headless
-    # options.headless = True
-    #
-    # driver = uc.Chrome(options=options)
-
-    options = uc.ChromeOptions()
-    options.add_experimental_option("prefs", {"credentials_enable_service": False, "profile": {"password_manager_enabled": False}})
-
-    driver = uc.Chrome(options=options)
-    driver = uc.Chrome()
-
-    selenium_manager = SeleniumManager(driver)
-    selenium_manager.login(email, password, timeout=10)
-    solutions = selenium_manager.get_solutions(link)
-    solution = """# Merge the licenses and biz_owners table on account
-licenses_owners = licenses.merge(biz_owners, on='account')
-
-# Group the results by title then count the number of accounts
-counted_df = licenses_owners.groupby('title').agg({'account':'count'})
-
-# Sort the counted_df in desending order
-sorted_df = counted_df.sort_values(by='account', ascending=False)
-
-# Use .head() method to print the first few rows of sorted_df
-print(sorted_df.head())"""
-
-    selenium_manager.solve_normal_exercise(solution, 10)
-    print(*solutions)
-    sleep(100)
-    driver.quit()  # Necessary for proper closing of driver, will leave a footprint in ram otherwise
-    '''
 
 
 if __name__ == "__main__":
