@@ -14,6 +14,8 @@ import time
 import undetected_chromedriver as uc
 import selenium
 
+from typing import Any
+
 # ⬇⬇⬇ What to Change ⬇⬇⬇ Placeholder until we get the json file and user input setup
 email = "jgelia@students.chccs.k12.nc.us"
 password = "sfjle"
@@ -38,6 +40,17 @@ def cmd_clear(t: DTerminal):
     hcolor = DColors.rgb(20, 148, 20)
     t.header("DCS Terminal", DColors.bold+DColors.reverse+hcolor+DColors.bg_black)
 
+def cmd_modify_savedata(data_name: str, new_data: object, t: DTerminal, jm: JSONManager):
+    data = jm.read()
+    if data_name not in data.keys():
+        return ("ERROR", "Data block not found", f'Data block "{data_name}" was not found in save file')
+
+    data[data_name] = new_data
+    jm.write(data)
+    t.disp("New Save Data Written", f"{new_data} was written to {data_name}")
+
+    return
+
 def cmd_help(command: str, t: DTerminal, p: Parser):
     # Gives an type description of commands
     if command not in p.lookup.keys():
@@ -52,6 +65,10 @@ def cmd_help(command: str, t: DTerminal, p: Parser):
         info = "This command takes no arguments\n"
     else:
         info = f"This command takes {len(func[1])} argument(s).\nOrder: {(', '.join([str(i) for i in func[1]]))}\n"
+    if len(func[2]) == 0:
+        info += "\nThis command has no flags\n"
+    else:
+        info += f"\nThis command takes {len(func[2])} argument(s).\n{(', '.join([str(i) for i in func[2]]))}\n"
     t.disp(title, info)
     return
     
@@ -86,6 +103,13 @@ def cmd_login(sm: SeleniumManager, t: DTerminal, jm: JSONManager):
     sm.login(settings["username"], settings["password"], timeout=15)
     return
 
+
+def cmd_course_autosolve(start_link: str, sm: SeleniumManager, t: DTerminal, jm: JSONManager, autoreset=False):
+    settings = jm.read()
+    sm.auto_solve_course(starting_link=start_link, timeout=settings["timeout"], reset_course=autoreset)
+    return
+
+
 def main():
     
     # TODO: make this look good
@@ -109,12 +133,12 @@ def main():
     if not settings["visible"]: 
         terminal.log("Chrome startup window disabled.")
         options.add_argument('--no-startup-window')
-    options.add_argument('--headless')
+        options.add_argument('--headless')
     # options.add_experimental_option("prefs", {"credentials_enable_service": False, "profile": {"password_manager_enabled": False}})
     driver = uc.Chrome(options=options)
     terminal.log("Chrome driver successfully created.")
     
-    seleniummanager = SeleniumManager(driver)
+    seleniummanager = SeleniumManager(driver=driver, terminal=terminal)
     terminal.log("Selenium manager initialized.")
     
     # all commands need to be put in here
@@ -122,9 +146,11 @@ def main():
         ("exit", cmd_exit, [], [], {"t": terminal, "driver": driver}),
         ("info", cmd_info, [], [], {"t": terminal, "data": settings}),
         ("clear", cmd_clear, [], [], {"t": terminal}),
+        ("modify", cmd_modify_savedata, [str, object], [], {"t": terminal, "jm": jsonmanager}),
         ("setcreds", cmd_setcredentials, [str, str], [], {"t": terminal, "jm": jsonmanager}),
         ("checkcreds", cmd_checkcredentials, [], ["--autoclear"], {"t": terminal, "jm": jsonmanager}),
-        ("login", cmd_login, [], [], {"sm": seleniummanager, "t": terminal, "jm": jsonmanager})
+        ("login", cmd_login, [], [], {"sm": seleniummanager, "t": terminal, "jm": jsonmanager}),
+        ("solvecourse", cmd_course_autosolve, [str], ["--autoreset"], {"sm": seleniummanager, "t": terminal, "jm": jsonmanager})
     ]
     parser = Parser(commands)
     parser.add_command("help", cmd_help, [str], [], {"t": terminal, "p": parser})

@@ -45,12 +45,14 @@ class Parser(object):
 
         # this is rather janky
         # Parsing arguments (*args)
-        std_types = [int, float, str]
+        std_types = [int, float, str, bool]
         parsed_args = []
         for t, arg in zip(func[1], args):
             try:
                 if t in std_types:
                     parsed_args.append(t(arg))
+                elif t is object:
+                    parsed_args.append(literal_eval(arg))
                 else:
                     parsed_args.append(t(literal_eval(arg)))
             except ValueError:

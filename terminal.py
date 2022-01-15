@@ -97,7 +97,7 @@ class DTerminal(object):
         # TODO: put long references into local variables
         dft = self.theme.default
         rst = DColors.reset
-        inp = input(f"{rst+dft[0]}>{rst+dft[1]} ")
+        inp = input(f"\n{rst+dft[0]}>{rst+dft[1]} ")
         print(DColors.reset)
         return inp
     
@@ -189,7 +189,7 @@ class DTerminal(object):
     
     # Puts a header at the top of the screen
     def header(self, header: str, formatting: str):
-        print(f"{formatting}{self.cloc(0, 0)}{header}{self.cloc(0, 1)}{DColors.reset}\n")
+        print(f"{formatting}{self.cloc(0, 0)}{header}{self.cloc(0, 1)}{DColors.reset}")
         
     def startup(self):
         """
