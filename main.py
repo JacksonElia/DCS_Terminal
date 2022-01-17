@@ -109,11 +109,18 @@ def cmd_login(sm: SeleniumManager, t: DTerminal, jm: JSONManager):
     sm.login(settings["username"], settings["password"], timeout=15)
     return
 
-
+# Extremely broken
 def cmd_course_autosolve(start_link: str, sm: SeleniumManager, t: DTerminal, jm: JSONManager, autoreset=False):
     settings = jm.read()
     sm.auto_solve_course(starting_link=start_link, timeout=settings["timeout"], reset_course=autoreset)
     return
+
+
+def cmd_get_answers(start_link: str, sm: SeleniumManager, t: DTerminal):
+    solutions, info = sm.get_solutions_and_exercises(start_link)
+    for i, b in zip(info, solutions):
+        title = f"{i['type']} {i['number']} ({i['link']})"
+        t.disp(title, b + "\n")
 
 
 def main():
@@ -139,7 +146,7 @@ def main():
         terminal.log("Chrome startup window disabled.")
         options.add_argument('--no-startup-window')
         options.add_argument('--headless')
-    options.add_experimental_option("prefs", {"credentials_enable_service": False, "profile": {"password_manager_enabled": False}})
+    # options.add_experimental_option("prefs", {"credentials_enable_service": False, "profile": {"password_manager_enabled": False}})
     driver = uc.Chrome(options=options)
     terminal.log("Chrome driver successfully created.")
     
@@ -155,7 +162,8 @@ def main():
         ("setcreds", cmd_setcredentials, [str, str], [], {"t": terminal, "jm": jsonmanager}),
         ("checkcreds", cmd_checkcredentials, [], ["--autoclear"], {"t": terminal, "jm": jsonmanager}),
         ("login", cmd_login, [], [], {"sm": seleniummanager, "t": terminal, "jm": jsonmanager}),
-        ("solvecourse", cmd_course_autosolve, [str], ["--autoreset"], {"sm": seleniummanager, "t": terminal, "jm": jsonmanager})
+        ("solvecourse", cmd_course_autosolve, [str], ["--autoreset"], {"sm": seleniummanager, "t": terminal, "jm": jsonmanager}),
+        ("answers", cmd_get_answers, [str], [], {"sm": seleniummanager, "t": terminal})
     ]
     parser = Parser(commands)
     parser.add_command("help", cmd_help, [str, int], [], {"t": terminal, "p": parser})

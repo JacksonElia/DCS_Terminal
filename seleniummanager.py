@@ -415,8 +415,14 @@ class SeleniumManager:
         :param timeout: How long it should wait to sees certain elements in the Multiple Choice exercise
         """
         # Gets the length of the child elements (the multiple choice options) in the parent element
-        WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH,
-                                                                                   '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[2]/div/div/div[2]/ul'))
+        try:
+            WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH,
+                                                                                    '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[2]/div/div/div[2]/ul'))
+        except selenium.common.exceptions.ElementNotInteractableException:
+                self.t.log("Radio button couldn't be clicked")
+        except selenium.common.exceptions.TimeoutException:
+                self.t.log("Radio button not found")
+
         multiple_choice_options = len(self.driver.find_elements_by_xpath(
             '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[2]/div/div/div[2]/ul/*'))
         for i in range(multiple_choice_options):
