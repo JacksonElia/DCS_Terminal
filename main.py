@@ -17,9 +17,9 @@ import selenium
 from typing import Any
 
 # ⬇⬇⬇ What to Change ⬇⬇⬇ Placeholder until we get the json file and user input setup
-email = "hjkhkhkhkhj@students.chccs.k12.nc.us"
-password = "h"
-link = "https://campus.datacamp.com/courses/introduction-to-data-visualization-with-seaborn/introduction-to-seaborn?ex=1"
+email = "vsun@students.chccs.k12.nc.us"
+password = "bringmesomesoup"
+link = "https://campus.datacamp.com/courses/improving-your-data-visualizations-in-python/highlighting-your-data?ex=1"
 reset_course = False
 wait_length = 0
 # ⬆⬆⬆ What to Change ⬆⬆⬆

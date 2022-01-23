@@ -278,8 +278,7 @@ class SeleniumManager:
         :param timeout: How long it should wait to sees certain elements in the normal exercise
         """
         try:
-            script_margin = WebDriverWait(self.driver, timeout=timeout).until(
-                lambda d: d.find_element(By.XPATH, '//*[@id="rendered-view"]/div/div/div[3]/div[1]'))
+            script_margin = self.wait_for_element(timeout, class_name="margin-view-overlays")
             sleep(1)
             # Clicks on the script to put it in focus
             script_margin.click()
@@ -306,7 +305,6 @@ class SeleniumManager:
         :param timeout: How long it should wait to sees certain elements in the Bullet exercise
         :return: How many solutions were used; The number of Bullet exercises
         """
-        solutions_used = 0
         answers_are_correct = True
         number_of_exercises = "0"
         try:
@@ -314,8 +312,7 @@ class SeleniumManager:
                 '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[1]/div/div/h5')) \
                 .text[-1]
             for i in range(int(number_of_exercises)):
-                script_margin = WebDriverWait(self.driver, timeout=timeout).until(
-                    lambda d: d.find_element(By.XPATH, '//*[@id="rendered-view"]/div/div/div[3]/div[1]'))
+                script_margin = self.wait_for_element(timeout, class_name="margin-view-overlays")
                 sleep(3)  # Necessary for ctrl + a to select everything properly
                 # Clicks on the script to put it in focus
                 script_margin.click()
@@ -392,10 +389,7 @@ class SeleniumManager:
                         except selenium.common.exceptions.TimeoutException:
                             print("Radio button not found")
                 else:
-                    # script_margin = WebDriverWait(self.driver, timeout=timeout).until(
-                    #     lambda d: d.find_element(By.XPATH, '//*[@id="rendered-view"]/div/div/div[3]/div[1]'))
-                    script_margin = WebDriverWait(self.driver, timeout=timeout).until(
-                        lambda d: d.find_element(By.CLASS_NAME, "margin-view-overlays"))
+                    script_margin = self.wait_for_element(timeout, class_name="margin-view-overlays")
                     sleep(3)  # Necessary for ctrl + a to select everything properly
                     script_margin.click()  # Sometimes doesn't work
                     # Copies the solution to clipboard
@@ -409,7 +403,7 @@ class SeleniumManager:
                     ActionChains(self.driver).key_down(Keys.CONTROL).send_keys("v").key_up(Keys.CONTROL).perform()
                     print("pasted answer")
                     self.click_submit(timeout=timeout)
-                    self.wait_for_submit(timeout=timeout)
+                    self.wait_for_element(timeout=timeout, xpath="//button[contains(@data-cy,'submit-button')]")
                     print("Found submit")
                     # Clears clipboard
                     pyperclip.copy("")
@@ -530,12 +524,17 @@ class SeleniumManager:
             print("Submit button not found")
             return False
 
-    def wait_for_submit(self, timeout: int, xpath="//button[contains(@data-cy,'submit-button')]"):
+    def wait_for_element(self, timeout: int, xpath="", class_name=""):
         try:
-            WebDriverWait(self.driver, timeout=timeout).until(EC.element_to_be_clickable((By.XPATH, xpath)))
+            if xpath != "":
+                return WebDriverWait(self.driver, timeout=timeout).until(EC.element_to_be_clickable((By.XPATH, xpath)))
+            elif class_name != "":
+                return WebDriverWait(self.driver, timeout=timeout).until(EC.element_to_be_clickable((By.CLASS_NAME, class_name)))
+            else:
+                raise ValueError
         except selenium.common.exceptions.StaleElementReferenceException:
             print("Element was stale")
-            self.wait_for_submit(timeout)
+            self.wait_for_element(timeout, xpath="//button[contains(@data-cy,'submit-button')]")
         except selenium.common.exceptions.TimeoutException:
             print("Submit button not found")
 
