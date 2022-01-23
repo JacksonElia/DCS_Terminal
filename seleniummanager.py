@@ -218,11 +218,10 @@ class SeleniumManager:
         else:
             # Clicks on the page, then enters in shortcut for the arrow button at the top
             try:
-                WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH,
-                    '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[1]/div')) \
+                WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, '//*[@id="gl-aside"]')) \
                     .click()
             except (selenium.common.exceptions.TimeoutException, selenium.common.exceptions.ElementClickInterceptedException):
-                print("The Instruction bar could not be clicked or found")
+                print("The Exercise bar could not be clicked or found")
             ActionChains(self.driver).key_down(Keys.CONTROL).send_keys("k").key_up(Keys.CONTROL).perform()
             print("Sent ctrl + k")
         # Waiting for next chapter to load
