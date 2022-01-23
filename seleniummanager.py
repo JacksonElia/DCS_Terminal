@@ -14,6 +14,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.remote.webelement import WebElement
 from time import sleep
 from terminal import DTerminal
 
@@ -526,17 +527,25 @@ class SeleniumManager:
 
     def wait_for_element(self, timeout: int, xpath="", class_name=""):
         try:
+            element = None
             if xpath != "":
-                return WebDriverWait(self.driver, timeout=timeout).until(EC.element_to_be_clickable((By.XPATH, xpath)))
+                element = WebDriverWait(self.driver, timeout=timeout).until(EC.element_to_be_clickable((By.XPATH, xpath)))
             elif class_name != "":
-                return WebDriverWait(self.driver, timeout=timeout).until(EC.element_to_be_clickable((By.CLASS_NAME, class_name)))
+                element = WebDriverWait(self.driver, timeout=timeout).until(EC.element_to_be_clickable((By.CLASS_NAME, class_name)))
             else:
                 raise ValueError
+            if type(element) == WebElement:
+                return element
         except selenium.common.exceptions.StaleElementReferenceException:
             print("Element was stale")
             self.wait_for_element(timeout, xpath="//button[contains(@data-cy,'submit-button')]")
         except selenium.common.exceptions.TimeoutException:
-            print("Submit button not found")
+            print("Element not found")
+            return
+        if xpath != "":
+            self.wait_for_element(timeout, xpath=xpath)
+        elif class_name != "":
+            self.wait_for_element(timeout, class_name=class_name)
 
     def find_continue(self, xpath: str, timeout: int) -> bool:
         try:
