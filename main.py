@@ -17,9 +17,9 @@ import selenium
 from typing import Any
 
 # ⬇⬇⬇ What to Change ⬇⬇⬇ Placeholder until we get the json file and user input setup
-email = "jgelia@students.chccs.k12.nc.us"
-password = "sfjle"
-link = "https://campus.datacamp.com/courses/introduction-to-sql/selecting-columns?ex=11"
+email = "vsun@students.chccs.k12.nc.us"
+password = "bringmesomesoup"
+link = "https://campus.datacamp.com/courses/introduction-to-data-visualization-with-seaborn/introduction-to-seaborn?ex=1"
 reset_course = False
 wait_length = 0
 # ⬆⬆⬆ What to Change ⬆⬆⬆
@@ -193,4 +193,12 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+
+    options = uc.ChromeOptions()
+    options.add_experimental_option("prefs", {"credentials_enable_service": False,
+                                              "profile": {"password_manager_enabled": False}})
+    driver = uc.Chrome(options=options)
+    selenium_manager = SeleniumManager(driver)
+    selenium_manager.login(email, password, timeout=10)
+    selenium_manager.auto_solve_course(starting_link=link, reset_course=False)
+    # main()
