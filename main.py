@@ -45,13 +45,11 @@ def cmd_modify_savedata(data_name: str, new_data: object, t: DTerminal, jm: JSON
     return
 
 
-def cmd_help(command: str, random: int, t: DTerminal, p: Parser):
+def cmd_help(command: str, t: DTerminal, p: Parser):
     # Gives an type description of commands
     if command not in p.lookup.keys():
         t.disp("", f"Command '{command}' does not exist.")
         return
-
-    t.disp("", f"Your Number: {random}")
 
     func = p.lookup[command]
     title = f"Command: {command}"
@@ -135,7 +133,7 @@ def main():
         terminal.log("Chrome startup window disabled.")
         options.add_argument('--no-startup-window')
         options.add_argument('--headless')
-    options.add_experimental_option("prefs", {"credentials_enable_service": False, "profile": {"password_manager_enabled": False}})
+    # options.add_experimental_option("prefs", {"credentials_enable_service": False, "profile": {"password_manager_enabled": False}})
     driver = uc.Chrome(options=options)
     terminal.log("Chrome driver successfully created.")
     
@@ -155,7 +153,7 @@ def main():
         ("answers", cmd_get_answers, [str], [], {"sm": seleniummanager, "t": terminal})
     ]
     parser = Parser(commands)
-    parser.add_command("help", cmd_help, [str, int], [], {"t": terminal, "p": parser})
+    parser.add_command("help", cmd_help, [str], [], {"t": terminal, "p": parser})
     
     terminal.log("Parser initialized.")
     terminal.log("Startup successful.")
