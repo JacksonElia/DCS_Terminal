@@ -30,8 +30,7 @@ class SeleniumManager:
         self.driver = driver
         self.t = terminal
 
-    def login(self, username: str, password: str, link="https://www.datacamp.com/users/sign_in",
-              timeout=15):
+    def login(self, username: str, password: str, link="https://www.datacamp.com/users/sign_in", timeout=15):
         """
         Logs into datacamp.
         :param username: Username or email for login
@@ -55,9 +54,7 @@ class SeleniumManager:
                 return
 
             # Next button click
-            WebDriverWait(self.driver, timeout=timeout).until(
-                lambda d: d.find_element(By.XPATH, '//*[@id="new_user"]/button')).click()
-
+            WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, '//*[@id="new_user"]/button')).click()
             # Password find and enter
             sleep(1)
             try:
@@ -79,7 +76,7 @@ class SeleniumManager:
             # Finds the user profile to ensure that the login was registered
             try:
                 WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH,
-                                                                                           '//*[@id="single-spa-application:@dcmfe/mfe-app-atlas-header"]/nav/div[4]/div[2]/div/button'))
+                    '//*[@id="single-spa-application:@dcmfe/mfe-app-atlas-header"]/nav/div[4]/div[2]/div/button'))
                 self.t.log("Sign In Successful")
             except TimeoutException:
                 self.t.log("Error Verifying Sign In")
@@ -118,11 +115,9 @@ class SeleniumManager:
                     for index, char in enumerate(solution):
                         if char == "\\":
                             # Other escape characters not that important like who uses \ooo lol
-                            if solution[index + 1] != "n" and solution[index + 1] != "t" and solution[
-                                                                                             index - 2: index + 1] != ") \\":
+                            if solution[index + 1] != "n" and solution[index + 1] != "t" and solution[index - 2: index + 1] != ") \\":
                                 deletion_index_list.append(index)
-
-                    # Reverses list so it doesn't mess with index when removing the character
+                    # Reverses list, so it doesn't mess with index when removing the character
                     for index in reversed(deletion_index_list):
                         solution = solution[:index] + solution[index + 1:]
                     solutions.append(solution)
@@ -251,13 +246,10 @@ class SeleniumManager:
         :param timeout: How long it should wait to see certain buttons
         """
         try:
-            course_outline_button = WebDriverWait(self.driver, timeout=timeout) \
-                .until(lambda d: d.find_element(By.CLASS_NAME, "css-b29ve4"))
+            course_outline_button = WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.CLASS_NAME, "css-b29ve4"))
             course_outline_button.click()
             self.t.log("Course outline button clicked")
-            reset_button = WebDriverWait(self.driver, timeout=timeout) \
-                .until(lambda d: d.find_element(By.XPATH, "//button[contains(@data-cy,'outline-reset')]"))
-
+            reset_button = WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, "//button[contains(@data-cy,'outline-reset')]"))
             # Several errors can happen with the rest button loading differently
             try:
                 reset_button.click()
@@ -310,7 +302,6 @@ class SeleniumManager:
 
             # Clicks on the script to put it in focus
             script_margin.click()
-
             action_chain = ActionChains(self.driver)
 
             # TODO: Make it work for OSX
@@ -338,8 +329,7 @@ class SeleniumManager:
         answers_are_correct = True
         number_of_exercises = "0"
         try:
-            number_of_exercises = WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH,
-                '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[1]/div/div/h5')) \
+            number_of_exercises = WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[1]/div/div/h5')) \
                 .text[-1]
             for i in range(int(number_of_exercises)):
                 script_margin = self.wait_for_element(timeout, class_name="margin-view-overlays")
@@ -388,21 +378,18 @@ class SeleniumManager:
         """
         solutions_used = 0
         try:
-            number_of_exercises = WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH,
-                '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[1]/div/div/h5')) \
+            number_of_exercises = WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[1]/div/div/h5')) \
                 .text[-1]
             for i in range(int(number_of_exercises)):
                 try:
-                    WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH,
-                        '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[1]/div')) \
+                    WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[1]/div')) \
                         .click()
                 except (TimeoutException, ElementClickInterceptedException):
                     self.t.log("The Instruction bar could not be clicked or found")
                 ActionChains(self.driver).send_keys(Keys.PAGE_DOWN).perform()
 
                 # Some Tab exercises have multiple choice questions
-                possible_multiple_choice_options = len(self.driver.find_elements_by_xpath(
-                    "//ul[contains(@class,'exercise--multiple-choice')]/*"))
+                possible_multiple_choice_options = len(self.driver.find_elements_by_xpath("//ul[contains(@class,'exercise--multiple-choice')]/*"))
                 if possible_multiple_choice_options > 0:
                     for j in range(possible_multiple_choice_options):
                         try:
@@ -410,8 +397,7 @@ class SeleniumManager:
                                 f'//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[2]/div/div/div/div/div/div/div[3]/ul/li[{j + 1}]/div/div/label'))
                             radio_input_button.click()
                             self.click_submit(timeout=timeout)
-                            tab_number = int(WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH,
-                                '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[1]/div/div/h5'))
+                            tab_number = int(WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[1]/div/div/h5'))
                                 .text[-3])
                             sleep(1)
 
@@ -473,8 +459,7 @@ class SeleniumManager:
         :param timeout: How long it should wait to sees certain elements in the Pure Multiple Choice exercise
         """
         # Gets the amount of the child elements (the multiple choice options) in the parent element
-        WebDriverWait(self.driver, timeout=timeout).until(
-            lambda d: d.find_element(By.XPATH, '//*[@id="root"]/div/main/div[1]/section/div/div[5]/div/div/ul'))
+        WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, '//*[@id="root"]/div/main/div[1]/section/div/div[5]/div/div/ul'))
         multiple_choice_options = len(
             self.driver.find_elements_by_xpath('//*[@id="root"]/div/main/div[1]/section/div/div[5]/div/div/ul/*'))
 
@@ -504,8 +489,7 @@ class SeleniumManager:
         except TimeoutException:
             self.t.log("Radio button not found")
 
-        multiple_choice_options = len(self.driver.find_elements_by_xpath(
-            '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[2]/div/div/div[2]/ul/*'))
+        multiple_choice_options = len(self.driver.find_elements_by_xpath('//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[2]/div/div/div[2]/ul/*'))
         for i in range(multiple_choice_options):
             try:
                 radio_input_button = WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH,
@@ -531,11 +515,9 @@ class SeleniumManager:
         :param timeout: How long it should wait to sees certain elements in the drag and drop exercise
         """
         try:
-            show_hint_button = WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH,
-                '//*[@id="root"]/div/main/div[2]/div/div[1]/section/div[1]/div[5]/div/section/nav/div/button'))
+            show_hint_button = WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, '//*[@id="root"]/div/main/div[2]/div/div[1]/section/div[1]/div[5]/div/section/nav/div/button'))
             show_hint_button.click()
-            show_answer_button = WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH,
-                '//*[@id="root"]/div/main/div[2]/div/div[1]/section/div[1]/div[5]/div/section/nav/div/button'))
+            show_answer_button = WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, '//*[@id="root"]/div/main/div[2]/div/div[1]/section/div[1]/div[5]/div/section/nav/div/button'))
             show_answer_button.click()
             self.click_submit(timeout=timeout)
             sleep(1)
@@ -622,31 +604,3 @@ class SeleniumManager:
             except TimeoutException:
                 self.t.log("Continue button not found")
                 return False
-
-    # Legacy method
-    # def click_continue(self, xpath: str, timeout: int) -> bool:
-    #     """
-    #     Clicks the continue button for an exercise and deals with the randomly occurring full page continue button.
-    #     :param timeout: How long it should wait to find the continue button
-    #     :param xpath: The xpath of the continue button
-    #     :return: A boolean for if it successfully clicked the continue button
-    #     """
-    #     try:
-    #         WebDriverWait(self.driver, timeout=timeout).until(EC.element_to_be_clickable((By.XPATH, xpath))).click()
-    #         self.t.log("Clicked the Continue button")
-    #         return True
-    #     except ElementNotInteractableException:
-    #         self.t.log("Continue button couldn't be clicked")
-    #         return False
-    #     except TimeoutException:
-    #         try:
-    #             WebDriverWait(self.driver, timeout=2).until(EC.element_to_be_clickable(
-    #                 (By.XPATH, '//*[@id="root"]/div/main/div[2]/div/div/div[3]/button'))).click()
-    #             self.t.log("Clicked the continue button")
-    #             return True
-    #         except ElementNotInteractableException:
-    #             self.t.log("Continue button couldn't be clicked")
-    #             return False
-    #         except TimeoutException:
-    #             self.t.log("Continue button not found")
-    #             return False
