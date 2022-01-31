@@ -108,8 +108,6 @@ class DTerminal(object):
     def disp(self, title: str, message: str):
         dft = self.theme.default
         rst = DColors.reset
-        # this is probably a bad solution
-        # filler = " "*(os.get_terminal_size()[0]-len(title))
         if str != "": print(f"{dft[2]}{DColors.reverse}{title}{rst}")
         print(f"{dft[2]}{message}{rst}")
         return
@@ -124,7 +122,7 @@ class DTerminal(object):
             f"{rst + log[0]}[{rst + log[1]}{now.hour}:{now.minute}:{now.second}{rst + log[0]}]{rst}{log[2]}: {message + rst}")
         return
 
-    def error(self, message: str, secondary: str = ""):
+    def error(self, message: str, secondary: str=""):
         err = self.theme.error
         rst = DColors.reset
         print(f"{rst + err[0]}ERROR:{rst + err[1]} {message + rst}")
@@ -132,63 +130,9 @@ class DTerminal(object):
         return
 
     # Draws a sprite at a location
-    def sprite_draw(self, x: int, y: int, sprite: list, style=""):
+    def sprite_draw(self, x: int, y: int, sprite: list, style: str=""):
         for i, line in enumerate(sprite):
             print(style + self.cloc(x=x, y=(y + i)) + line)
-        return
-
-    # Syntax highlighting for basic python
-    # TODO: fix comment bug (seen in example)
-    # TODO: highlight via sectioning rather than replacing
-    # step through the code and look for starters, such as quotes comments or function definitions, then section them accordingly to highly them seperately and then recombine
-    def syntax_highlight(self, code: str, background=""):
-        keywords = ["def", "for", "in", "class", "return", "pass", "continue", "if", "else", "try", "except", "match",
-                    "case"]
-        symbols = ["{", "}", "(", ")", ",", ":", "=", "+", "-", "/",
-                   "*"]  # Square brackets arent included because they break the escape codes
-        rst = DColors.reset
-        syntax = self.theme.syntax
-
-        formatted = code.replace("\n", f"{rst}\n")
-
-        for word in keywords:
-            formatted = formatted.replace(f"{word} ", f"{syntax[0]}{word}{rst} ")
-            formatted = formatted.replace(f"{word}\n", f"{syntax[0]}{word}{rst}\n")
-        for symbol in symbols:
-            formatted = formatted.replace(symbol, f"{syntax[3]}{symbol}{rst}")
-
-        search = [0, 0]
-        start = True
-
-        while search[0] != -1:
-
-            # time.sleep(0.1)
-            search[0] = formatted[search[1]:].find('"')
-            if search[0] == -1: break
-
-            # print("\n" + str(start))
-            # print(formatted[search[1]:] + "\n")
-
-            search[1] += search[0] + 1
-
-            if start:
-                formatted = formatted[:search[1] - 1] + syntax[4] + formatted[search[1] - 1:]
-                search[1] += len(syntax[4])
-            else:
-                formatted = formatted[:search[1]] + rst + formatted[search[1]:]
-                search[1] += len(rst)
-
-            start = not start
-
-        formatted = formatted.replace("#", f"{syntax[1]}#")
-
-        return formatted
-
-    # Draws a block of code with syntax highlighting
-    def code_block(self, x: int, y: int, block: str):
-        # block = self.syntax_highlight(block)
-        code = block.split("\n")
-        self.sprite_draw(x, y, code)
         return
 
     # Puts a header at the top of the screen
@@ -199,7 +143,6 @@ class DTerminal(object):
         """
         Purely visual thing, just because it looks cool (MAY BECOME LEGACY)
         """
-        size = os.get_terminal_size()
         load = "Loading..."
         print(DColors.bgreen + DColors.bold)
         for i, c in enumerate(load):

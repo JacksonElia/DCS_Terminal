@@ -27,6 +27,7 @@ class Parser(object):
         """
         self.lookup[command] = (function, args, flags, defkwargs)
 
+
     # TODO: Make code more readable
     def parse(self, given: str) -> tuple:
         """
@@ -69,7 +70,7 @@ class Parser(object):
         info = (cmd, tuple(parsed_args), parsed_flags)
         return info
 
-    # TODO: Better error checking/logging
+
     def execute(self, info=None):
         """
         Executes a function given info parameters
