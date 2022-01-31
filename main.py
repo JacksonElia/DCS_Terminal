@@ -2,7 +2,6 @@
 main.py: Responsible for all main functions and testing
 Contributors: Jackson Elia, Andrew Combs
 """
-
 import os
 
 from parser import Parser
@@ -13,16 +12,6 @@ from seleniummanager import SeleniumManager
 import time
 import undetected_chromedriver as uc
 import selenium
-
-from typing import Any
-
-# ⬇⬇⬇ What to Change ⬇⬇⬇ Placeholder until we get the json file and user input setup
-email = "jiojoius"
-password = "joijojjoj"
-link = "https://campus.datacamp.com/courses/improving-your-data-visualizations-in-python/highlighting-your-data?ex=1"
-reset_course = False
-wait_length = 0
-# ⬆⬆⬆ What to Change ⬆⬆⬆
 
 
 # System commands
@@ -109,7 +98,7 @@ def cmd_login(sm: SeleniumManager, t: DTerminal, jm: JSONManager):
     sm.login(settings["username"], settings["password"], timeout=15)
     return
 
-# Extremely broken
+
 def cmd_course_autosolve(start_link: str, sm: SeleniumManager, t: DTerminal, jm: JSONManager, autoreset=False):
     settings = jm.read()
     sm.auto_solve_course(starting_link=start_link, timeout=settings["timeout"], reset_course=autoreset)
@@ -146,7 +135,7 @@ def main():
         terminal.log("Chrome startup window disabled.")
         options.add_argument('--no-startup-window')
         options.add_argument('--headless')
-    # options.add_experimental_option("prefs", {"credentials_enable_service": False, "profile": {"password_manager_enabled": False}})
+    options.add_experimental_option("prefs", {"credentials_enable_service": False, "profile": {"password_manager_enabled": False}})
     driver = uc.Chrome(options=options)
     terminal.log("Chrome driver successfully created.")
     
@@ -193,12 +182,4 @@ def main():
 
 
 if __name__ == "__main__":
-
-    options = uc.ChromeOptions()
-    options.add_experimental_option("prefs", {"credentials_enable_service": False,
-                                              "profile": {"password_manager_enabled": False}})
-    driver = uc.Chrome(options=options)
-    selenium_manager = SeleniumManager(driver)
-    selenium_manager.login(email, password, timeout=10)
-    selenium_manager.auto_solve_course(starting_link=link, reset_course=reset_course)
-    # main()
+    main()
