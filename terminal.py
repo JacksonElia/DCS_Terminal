@@ -12,7 +12,7 @@ import random
 
 # might remove the D in front of all the names but for now it helps with making it not generic
 class DTheme(object):
-    def __init__(self, default: tuple, log: tuple, error: tuple, syntax: tuple):
+    def __init__(self, default: tuple, log: tuple, error: tuple):
         self.default = default  # (input symbol, input text, default text)
         self.log = log  # (brackets, info, message)
         self.error = error  # (header, main message, secondary)
