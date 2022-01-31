@@ -235,9 +235,9 @@ class SeleniumManager:
         else:
 
             # Clicks on the page, then enters in shortcut for the arrow button at the top
+
             try:
-                WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, '//*[@id="gl-aside"]')) \
-                    .click()
+                self.wait_for_element(timeout=timeout, xpath='//*[@id="gl-aside"]').click()
             except (TimeoutException, ElementClickInterceptedException):
                 self.t.log("The Exercise bar could not be clicked or found")
             ActionChains(self.driver).key_down(Keys.CONTROL).send_keys("k").key_up(Keys.CONTROL).perform()
@@ -631,9 +631,9 @@ class SeleniumManager:
         try:
             WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, xpath))
             self.t.log("Found the Continue button")
-            self.t.log("/\\\n\\/")
+            self.t.log("/--------------------------\\")
             self.t.log("Exercise solved successfully")
-            self.t.log("/\\\n\\/")
+            self.t.log("\\--------------------------/")
             return True
         except TimeoutException:
             try:
