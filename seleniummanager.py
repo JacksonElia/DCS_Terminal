@@ -130,9 +130,17 @@ class SeleniumManager:
         return solutions, exercise_dicts
 
     def auto_solve_course(self, starting_link: str, timeout=10, reset_course=False, wait_length=0):
+        """
+        Solves a whole Datacamp course.
+        :param starting_link: The link of the Datacamp course to solve
+        :param timeout: How long it waits for elements to appear
+        :param reset_course: If the course and xp earned from the course should be reset
+        :param wait_length: Delay in between exercises
+        """
         if reset_course:
             self.driver.get(starting_link)
             self.reset_course(timeout)
+
         chapter_link = starting_link
         done_with_course = False
         while not done_with_course:
@@ -463,7 +471,6 @@ class SeleniumManager:
             sleep(1)  # Might not be necessary
         return self.find_continue(xpath="//button[contains(@data-cy,'next-exercise-button')]", timeout=timeout)
 
-    # TODO: Make drag and drop work
     def solve_drag_and_drop(self, timeout: int) -> bool:
         """
         Skips drag and drop by showing answer, clicking submit answer, and clicking continue.
@@ -517,6 +524,12 @@ class SeleniumManager:
             return False
 
     def wait_for_element(self, timeout: int, xpath="", class_name=""):
+        """
+        Waits for an element and returns one if found. Can use either xpath or class name to find the element.
+        :param timeout: How long it should wait to find the element
+        :param xpath: The xpath of the element (don't specify if searching by class name)
+        :param class_name: The class name of the element (don't specify if searching by xpath)
+        """
         try:
             element = None
             if xpath != "":
@@ -539,6 +552,11 @@ class SeleniumManager:
             self.wait_for_element(timeout, class_name=class_name)
 
     def find_continue(self, xpath: str, timeout: int) -> bool:
+        """
+        Returns a boolean based on if the continue button was found or not.
+        :param timeout: How long it should wait to find the continue button
+        :param xpath: The xpath of the continue button
+        """
         try:
             WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, xpath))
             self.t.log("Found the Continue button")
