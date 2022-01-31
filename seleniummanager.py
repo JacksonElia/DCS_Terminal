@@ -362,7 +362,6 @@ class SeleniumManager:
                 # TODO: Check if this is necessary anymore
                 if self.check_for_incorrect_submission(timeout=timeout):
                     answers_are_correct = False
-
                 # Clears clipboard
                 pyperclip.copy("")
             if answers_are_correct:
