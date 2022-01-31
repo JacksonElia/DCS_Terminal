@@ -16,7 +16,6 @@ class DTheme(object):
         self.default = default  # (input symbol, input text, default text)
         self.log = log  # (brackets, info, message)
         self.error = error  # (header, main message, secondary)
-        self.syntax = syntax  # (keywords, comments, builtin types, symbols, quotes)
         return
 
 

@@ -116,7 +116,6 @@ def main():
         default=(DColors.green+DColors.bold+DColors.reverse, DColors.bwhite, DColors.green),
         log=(DColors.bgreen+DColors.rgb(10, 60, 10, True), DColors.green+DColors.rgb(10, 60, 10, True), DColors.bwhite+DColors.rgb(70,200,70)),
         error=(DColors.red+DColors.bold+DColors.reverse, DColors.bred, DColors.rgb(200,70,70)),
-        syntax=(DColors.green, DColors.blue, DColors.cyan, DColors.yellow, DColors.bred)
     )  
     
     terminal = DTerminal(theme=theme)
