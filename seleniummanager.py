@@ -17,7 +17,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.common.exceptions import ElementNotInteractableException, TimeoutException, ElementClickInterceptedException, StaleElementReferenceException
 from time import sleep
-from terminal import DTerminal
+from terminal import DColors, DTerminal
 
 from typing import List, Tuple
 
@@ -72,12 +72,15 @@ class SeleniumManager:
             WebDriverWait(self.driver, timeout=timeout).until(
                 lambda d: d.find_element(By.XPATH, '//*[@id="new_user"]/div[1]/div[3]/input')).click()
             self.t.log("Signed In")
+            self.t.log(f"Successful with email: {username} and password: " + "*" * len(password))
 
             # Finds the user profile to ensure that the login was registered
             try:
                 WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH,
                     '//*[@id="single-spa-application:@dcmfe/mfe-app-atlas-header"]/nav/div[4]/div[2]/div/button'))
-                self.t.log("Sign In Successful")
+                self.t.log("/\\\n\\/")
+                self.t.log("Sign In Confirmed")
+                self.t.log("/\\\n\\/")
             except TimeoutException:
                 self.t.log("Error Verifying Sign In")
         except TimeoutException:
@@ -174,7 +177,8 @@ class SeleniumManager:
             tries = 0
             while not exercise_solved and tries < max_tries:
                 self.driver.get(exercise["link"])
-
+                self.t.log("/")
+                self.t.log("Got exercise link :" + exercise["link"])
                 # User can set this to add delay in between exercises
                 sleep(wait_length)
                 tries += 1
@@ -257,6 +261,7 @@ class SeleniumManager:
             course_outline_button = WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.CLASS_NAME, "css-b29ve4"))
             course_outline_button.click()
             self.t.log("Course outline button clicked")
+            self.t.log("Resetting course XP")
             reset_button = WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, "//button[contains(@data-cy,'outline-reset')]"))
             # Several errors can happen with the rest button loading differently
             try:
@@ -269,8 +274,13 @@ class SeleniumManager:
             Alert(self.driver).accept()
             sleep(.2)
             Alert(self.driver).accept()
+
+            self.t.log("/\\\n\\/")
+            self.t.log("Reset successful")
+            self.t.log("/\\\n\\/")
         except TimeoutException:
             self.t.log("The Course Outline Button was not found before timeout")
+            self.t.log(DColors.red + "Reset Failed")
 
     def solve_video_exercise(self, timeout: int):
         """
@@ -287,6 +297,9 @@ class SeleniumManager:
                 got_it_button = WebDriverWait(self.driver, timeout=2).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@data-cy,'submit-button')]")))
                 self.driver.execute_script("arguments[0].click();", got_it_button)
                 self.t.log("Clicked the Got it button")
+                self.t.log("/\\\n\\/")
+                self.t.log("Video Exercise solved successfully")
+                self.t.log("/\\\n\\/")
                 return True
 
             except ElementNotInteractableException:
@@ -294,7 +307,7 @@ class SeleniumManager:
                 return False
 
             except TimeoutException:
-                self.t.log("Got it button not found")
+                self.t.log(DColors.red + "Got it button not found")
                 return False
 
     def solve_normal_exercise(self, solution: str, timeout: int) -> bool:
@@ -398,11 +411,14 @@ class SeleniumManager:
                 # Some Tab exercises have multiple choice questions
                 possible_multiple_choice_options = len(self.driver.find_elements_by_xpath("//ul[contains(@class,'exercise--multiple-choice')]/*"))
                 if possible_multiple_choice_options > 0:
+                    self.t.log("Tab exercise has a multiple choice section")
+                    self.t.log(f"There are {possible_multiple_choice_options} options")
                     for j in range(possible_multiple_choice_options):
                         try:
                             radio_input_button = WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH,
                                 f'//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[2]/div/div/div/div/div/div/div[3]/ul/li[{j + 1}]/div/div/label'))
                             radio_input_button.click()
+                            self.t.log("Clicked option " + str(j))
                             self.click_submit(timeout=timeout)
                             tab_number = int(WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[1]/div/div/h5'))
                                 .text[-3])
@@ -426,6 +442,7 @@ class SeleniumManager:
                     script_margin = self.wait_for_element(timeout, class_name="margin-view-overlays")
                     sleep(3)  # Necessary for ctrl + a to select everything properly
                     script_margin.click()  # Sometimes doesn't work
+                    self.t.log("Clicked on Script")
 
                     # Copies the solution to clipboard
                     pyperclip.copy(solutions[solutions_used])
@@ -439,10 +456,9 @@ class SeleniumManager:
 
                     # Pastes the solution
                     ActionChains(self.driver).key_down(Keys.CONTROL).send_keys("v").key_up(Keys.CONTROL).perform()
-                    self.t.log("pasted answer")
+                    self.t.log("Pasted answer")
                     self.click_submit(timeout=timeout)
                     self.wait_for_element(timeout=timeout, xpath="//button[contains(@data-cy,'submit-button')]")
-                    self.t.log("Found submit")
 
                     # Clears clipboard
                     pyperclip.copy("")
@@ -467,10 +483,11 @@ class SeleniumManager:
         """
         # Gets the amount of the child elements (the multiple choice options) in the parent element
         WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, '//*[@id="root"]/div/main/div[1]/section/div/div[5]/div/div/ul'))
-        multiple_choice_options = len(
-            self.driver.find_elements_by_xpath('//*[@id="root"]/div/main/div[1]/section/div/div[5]/div/div/ul/*'))
+        multiple_choice_options = len(self.driver.find_elements_by_xpath('//*[@id="root"]/div/main/div[1]/section/div/div[5]/div/div/ul/*'))
+        self.t.log(f"Found {multiple_choice_options} multiple choice options")
 
         for i in range(multiple_choice_options):
+            self.t.log("Trying option " + str(multiple_choice_options + 1))
             WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, "//body")).click()
             ActionChains(self.driver).send_keys(str(i + 1), Keys.ENTER).perform()
             if self.find_continue(xpath="//button[contains(@data-cy,'completion-pane-continue-button')]", timeout=timeout):
@@ -487,8 +504,8 @@ class SeleniumManager:
         # Gets the length of the child elements (the multiple choice options) in the parent element
         # TODO: Find out if this is necessary
         try:
-            WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH,
-                '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[2]/div/div/div[2]/ul'))
+            WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, '//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[2]/div/div/div[2]/ul'))
+            self.t.log("Exercise loaded")
 
         except ElementNotInteractableException:
             self.t.log("Radio button couldn't be clicked")
@@ -497,7 +514,9 @@ class SeleniumManager:
             self.t.log("Radio button not found")
 
         multiple_choice_options = len(self.driver.find_elements_by_xpath('//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[2]/div/div/div[2]/ul/*'))
+        self.t.log(f"Found {multiple_choice_options} multiple choice options")
         for i in range(multiple_choice_options):
+            self.t.log("Trying option " + str(multiple_choice_options + 1))
             try:
                 radio_input_button = WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH,
                     f'//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[2]/div/div/div[2]/ul/li[{i + 1}]/div/div/label'))
@@ -528,7 +547,7 @@ class SeleniumManager:
             self.click_submit(timeout=timeout)
             sleep(1)
             ActionChains(self.driver).send_keys(Keys.ENTER).perform()
-            # It's hard for it to mess this up
+            self.t.log("Skipped drag and drop exercise successfully")
             return True
 
         except TimeoutException:
@@ -561,6 +580,7 @@ class SeleniumManager:
         try:
             WebDriverWait(self.driver, timeout=timeout).until(EC.element_to_be_clickable((By.XPATH, xpath))).click()
             self.t.log("Clicked the Submit button")
+
             return True
 
         except ElementNotInteractableException:
@@ -586,11 +606,11 @@ class SeleniumManager:
                 element = WebDriverWait(self.driver, timeout=timeout).until(EC.element_to_be_clickable((By.CLASS_NAME, class_name)))
             else:
                 raise ValueError
-            if type(element) == WebElement:
+            if type(element) == WebElement and element is not None:
                 return element
 
         except StaleElementReferenceException:
-            self.t.log("Element was stale")
+            self.t.log(DColors.red + "Element was stale")
             self.wait_for_element(timeout, xpath="//button[contains(@data-cy,'submit-button')]")
 
         except TimeoutException:
@@ -611,11 +631,17 @@ class SeleniumManager:
         try:
             WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, xpath))
             self.t.log("Found the Continue button")
+            self.t.log("/\\\n\\/")
+            self.t.log("Exercise solved successfully")
+            self.t.log("/\\\n\\/")
             return True
         except TimeoutException:
             try:
                 WebDriverWait(self.driver, timeout=2).until(lambda d: d.find_element(By.XPATH, '//*[@id="root"]/div/main/div[2]/div/div/div[3]/button'))
                 self.t.log("Found the continue button")
+                self.t.log("/\\\n\\/")
+                self.t.log("Exercise solved successfully")
+                self.t.log("/\\\n\\/")
                 return True
 
             except TimeoutException:
