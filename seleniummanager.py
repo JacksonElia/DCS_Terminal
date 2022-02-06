@@ -177,8 +177,9 @@ class SeleniumManager:
             tries = 0
             while not exercise_solved and tries < max_tries:
                 self.driver.get(exercise["link"])
-                self.t.log("/-----------------\\")
+                self.t.log("******************")
                 self.t.log("Got exercise link: " + exercise["link"])
+                self.t.log("******************")
                 # User can set this to add delay in between exercises
                 sleep(wait_length)
                 tries += 1
