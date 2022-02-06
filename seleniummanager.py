@@ -323,7 +323,10 @@ class SeleniumManager:
             sleep(1)
 
             # Clicks on the script to put it in focus
-            script_margin.click()
+            try:
+                script_margin.click()
+            except AttributeError:
+                self.t.log("Script Margin could not be found")
             action_chain = ActionChains(self.driver)
 
             # TODO: Make it work for OSX
@@ -358,7 +361,10 @@ class SeleniumManager:
                 sleep(3)  # Necessary for ctrl + a to select everything properly
 
                 # Clicks on the script to put it in focus
-                script_margin.click()
+                try:
+                    script_margin.click()
+                except AttributeError:
+                    self.t.log("Script Margin could not be found, attempting to continue anyways")
                 action_chain = ActionChains(self.driver)
 
                 # Sends CTRL + A
@@ -442,7 +448,10 @@ class SeleniumManager:
                 else:
                     script_margin = self.wait_for_element(timeout, class_name="margin-view-overlays")
                     sleep(3)  # Necessary for ctrl + a to select everything properly
-                    script_margin.click()  # Sometimes doesn't work
+                    try:
+                        script_margin.click()
+                    except AttributeError:
+                        self.t.log("Script Margin could not be found")
                     self.t.log("Clicked on Script")
 
                     # Copies the solution to clipboard
@@ -450,7 +459,10 @@ class SeleniumManager:
                     solutions_used += 1
 
                     # Clicks on the script to put it in focus
-                    script_margin.click()
+                    try:
+                        script_margin.click()
+                    except AttributeError:
+                        self.t.log("Script Margin could not be found")
 
                     # Sends CTRL + A
                     ActionChains(self.driver).key_down(Keys.CONTROL).send_keys("a").key_up(Keys.CONTROL).perform()
@@ -488,7 +500,7 @@ class SeleniumManager:
         self.t.log(f"Found {multiple_choice_options} multiple choice options")
 
         for i in range(multiple_choice_options):
-            self.t.log("Trying option " + str(multiple_choice_options + 1))
+            self.t.log("Trying option " + str(i + 1))
             WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH, "//body")).click()
             ActionChains(self.driver).send_keys(str(i + 1), Keys.ENTER).perform()
             if self.find_continue(xpath="//button[contains(@data-cy,'completion-pane-continue-button')]", timeout=timeout):
@@ -517,7 +529,7 @@ class SeleniumManager:
         multiple_choice_options = len(self.driver.find_elements_by_xpath('//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[2]/div/div/div[2]/ul/*'))
         self.t.log(f"Found {multiple_choice_options} multiple choice options")
         for i in range(multiple_choice_options):
-            self.t.log("Trying option " + str(multiple_choice_options + 1))
+            self.t.log("Trying option " + str(i + 1))
             try:
                 radio_input_button = WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH,
                     f'//*[@id="gl-aside"]/div/aside/div/div/div/div[2]/div[2]/div/div/div[2]/ul/li[{i + 1}]/div/div/label'))
