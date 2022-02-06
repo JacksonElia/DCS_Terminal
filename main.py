@@ -114,8 +114,8 @@ def main():
     # TODO: make this look good
     theme = DTheme(
         default=(DColors.green+DColors.bold+DColors.reverse, DColors.bwhite, DColors.green),
-        log=(DColors.bgreen+DColors.rgb(10, 60, 10, True), DColors.green+DColors.rgb(10, 60, 10, True), DColors.bwhite+DColors.rgb(70,200,70)),
-        error=(DColors.red+DColors.bold+DColors.reverse, DColors.bred, DColors.rgb(200,70,70)),
+        log=(DColors.bgreen+DColors.rgb(10, 60, 10, True), DColors.green+DColors.rgb(10, 60, 10, True), DColors.bwhite + DColors.rgb(70, 200, 70)),
+        error=(DColors.red+DColors.bold+DColors.reverse, DColors.bred, DColors.rgb(200, 70, 70)),
     )  
     
     terminal = DTerminal(theme=theme)
@@ -123,21 +123,21 @@ def main():
     
     dir = os.path.dirname(os.path.realpath(__file__))
     jsonmanager = JSONManager(fp=dir)
-    terminal.log("JSON manager loaded.")
+    terminal.log("JSON manager loaded")
     settings = jsonmanager.read()
     
     options = uc.ChromeOptions()
-    terminal.log("Chrome options loaded.")
+    terminal.log("Selenium options loaded")
     if not settings["visible"]: 
         terminal.log("Chrome startup window disabled.")
         options.add_argument('--no-startup-window')
         options.add_argument('--headless')
     # options.add_experimental_option("prefs", {"credentials_enable_service": False, "profile": {"password_manager_enabled": False}})
     driver = uc.Chrome(options=options)
-    terminal.log("Chrome driver successfully created.")
+    terminal.log("--Undetected driver successfully created--")
     
     seleniummanager = SeleniumManager(driver=driver, terminal=terminal)
-    terminal.log("Selenium manager initialized.")
+    terminal.log("*Selenium manager initialized*")
     
     # all commands need to be put in here
     commands = [
@@ -160,7 +160,7 @@ def main():
     time.sleep(1)
     
     terminal.clear()
-    terminal.header("DCS Terminal", DColors.bold+DColors.reverse+DColors.rgb(20, 148, 20)+DColors.bg_black)
+    terminal.header("DCS Terminal", DColors.bold + DColors.reverse + DColors.rgb(20, 148, 20)+DColors.bg_black)
     
     while True:
         inp = terminal.prompt()

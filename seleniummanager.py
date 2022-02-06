@@ -177,7 +177,7 @@ class SeleniumManager:
             tries = 0
             while not exercise_solved and tries < max_tries:
                 self.driver.get(exercise["link"])
-                self.t.log("/")
+                self.t.log("/-----------------\\")
                 self.t.log("Got exercise link :" + exercise["link"])
                 # User can set this to add delay in between exercises
                 sleep(wait_length)
@@ -275,9 +275,9 @@ class SeleniumManager:
             sleep(.2)
             Alert(self.driver).accept()
 
-            self.t.log("/\\\n\\/")
+            self.t.log("/--------------\\")
             self.t.log("Reset successful")
-            self.t.log("/\\\n\\/")
+            self.t.log("\\--------------/")
         except TimeoutException:
             self.t.log("The Course Outline Button was not found before timeout")
             self.t.log(DColors.red + "Reset Failed")
@@ -297,9 +297,9 @@ class SeleniumManager:
                 got_it_button = WebDriverWait(self.driver, timeout=2).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@data-cy,'submit-button')]")))
                 self.driver.execute_script("arguments[0].click();", got_it_button)
                 self.t.log("Clicked the Got it button")
-                self.t.log("/\\\n\\/")
+                self.t.log("/--------------------------------\\")
                 self.t.log("Video Exercise solved successfully")
-                self.t.log("/\\\n\\/")
+                self.t.log("\\--------------------------------/")
                 return True
 
             except ElementNotInteractableException:
@@ -579,7 +579,7 @@ class SeleniumManager:
         """
         try:
             WebDriverWait(self.driver, timeout=timeout).until(EC.element_to_be_clickable((By.XPATH, xpath))).click()
-            self.t.log("Clicked the Submit button")
+            self.t.log("[] Clicked the Submit button []")
 
             return True
 
@@ -588,7 +588,7 @@ class SeleniumManager:
             return False
 
         except TimeoutException:
-            self.t.log("Submit button not found")
+            self.t.log("/ Submit button not found /")
             return False
 
     def wait_for_element(self, timeout: int, xpath="", class_name=""):
@@ -614,7 +614,7 @@ class SeleniumManager:
             self.wait_for_element(timeout, xpath="//button[contains(@data-cy,'submit-button')]")
 
         except TimeoutException:
-            self.t.log("Element not found")
+            self.t.log("/ Element not found /")
             return
 
         if xpath != "":
@@ -638,12 +638,12 @@ class SeleniumManager:
         except TimeoutException:
             try:
                 WebDriverWait(self.driver, timeout=2).until(lambda d: d.find_element(By.XPATH, '//*[@id="root"]/div/main/div[2]/div/div/div[3]/button'))
-                self.t.log("Found the continue button")
-                self.t.log("/\\\n\\/")
+                self.t.log("Found the Continue button")
+                self.t.log("/--------------------------\\")
                 self.t.log("Exercise solved successfully")
-                self.t.log("/\\\n\\/")
+                self.t.log("\\--------------------------/")
                 return True
 
             except TimeoutException:
-                self.t.log("Continue button not found")
+                self.t.log("/ Continue button not found /")
                 return False
