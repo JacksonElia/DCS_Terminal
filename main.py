@@ -67,6 +67,11 @@ def cmd_help(command: str, t: DTerminal, p: Parser):
     return
 
 
+def cmd_cmdlist(t: DTerminal, p: Parser):
+    for cmd in p.lookup.keys():
+        t.disp("", f"{cmd}")
+
+
 # Selenium Manager shell commands
 # THIS MIGHT NOT BE A GOOD WAY TO DO IT !
 # TODO: add error checking and better logging
@@ -153,6 +158,7 @@ def main():
     ]
     parser = Parser(commands)
     parser.add_command("help", cmd_help, [str], [], {"t": terminal, "p": parser})
+    parser.add_command("cmdlist", cmd_cmdlist, [], [], {"t": terminal, "p": parser})
     
     terminal.log("Parser initialized.")
     terminal.log("Startup successful.")

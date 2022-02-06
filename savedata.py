@@ -12,7 +12,7 @@ version = 1.0
 authors = ["Jackson Elia", "Andrew Combs"]
 functionality = "Full Auto"
 
-visible = False
+visible = True
 timeout = 15
 
 username = ""
