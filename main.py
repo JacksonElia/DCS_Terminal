@@ -12,7 +12,7 @@ from seleniummanager import SeleniumManager
 import time
 import undetected_chromedriver as uc
 import selenium
-
+import threading
 
 # System commands
 def cmd_exit(t: DTerminal, driver: selenium.webdriver):
@@ -104,6 +104,8 @@ def cmd_login(sm: SeleniumManager, t: DTerminal, jm: JSONManager):
 
 def cmd_course_autosolve(start_link: str, sm: SeleniumManager, t: DTerminal, jm: JSONManager, autoreset=False):
     settings = jm.read()
+    # t1 = threading.Thread(target=sm.auto_solve_course, args=[start_link, settings["timeout"], autoreset])
+    # t1.start()
     sm.auto_solve_course(starting_link=start_link, timeout=settings["timeout"], reset_course=autoreset)
     return
 

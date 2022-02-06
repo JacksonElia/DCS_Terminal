@@ -78,13 +78,13 @@ class SeleniumManager:
             try:
                 WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH,
                     '//*[@id="single-spa-application:@dcmfe/mfe-app-atlas-header"]/nav/div[4]/div[2]/div/button'))
-                self.t.log("/\\\n\\/")
+                self.t.log("*****************")
                 self.t.log("Sign In Confirmed")
-                self.t.log("/\\\n\\/")
+                self.t.log("*****************")
             except TimeoutException:
-                self.t.log("Error Verifying Sign In")
+                self.t.log(DColors.red + "Error Verifying Sign In")
         except TimeoutException:
-            self.t.log("Next button or Sign in button not present")
+            self.t.log(DColors.red + "Next button or Sign in button not present, try logging in again")
 
     def get_solutions_and_exercises(self, link: str) -> Tuple[list, List[dict]]:
         """
@@ -178,7 +178,7 @@ class SeleniumManager:
             while not exercise_solved and tries < max_tries:
                 self.driver.get(exercise["link"])
                 self.t.log("/-----------------\\")
-                self.t.log("Got exercise link :" + exercise["link"])
+                self.t.log("Got exercise link: " + exercise["link"])
                 # User can set this to add delay in between exercises
                 sleep(wait_length)
                 tries += 1
