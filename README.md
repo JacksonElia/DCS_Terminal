@@ -1,11 +1,3 @@
-# Datacamp Solver Terminal
-Datacamp.com has many serious vulnerabilities and this overengineered (and yet still poorly made) pseudo-terminal aims to exploit every single one of them. Its features include but are not limited to:
-
- - Getting database hints and answers for chapters and modules
- - Full module automation
- - An unnecessarily complex control system that looks a lot smarter than it actually is
-
-It can probably be run on any terminal shell, but will work best on those with *TrueColor* support, such as the MacOS, Linux, or *new* Windows Terminal. 
-
-# Usage
-This will be filled out once it is usable!
+![DCSTerminal-Banner](https://user-images.githubusercontent.com/85963782/159130727-c8536e41-f8b3-45d1-b721-454ea6c9efa5.png)
+<hr>
+This program will automatically finish a datacamp course in minutes using a hacker-esque terminal! It has a few important commands and settings to know about, so either watch <a href="https://github.com/Traptricker/DCS_Terminal/edit/master/README.md">this</a> video, or continue reading this readme.
