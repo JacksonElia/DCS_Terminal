@@ -14,6 +14,7 @@ import undetected_chromedriver as uc
 import selenium
 import threading
 
+
 # System commands
 def cmd_exit(t: DTerminal, driver: selenium.webdriver):
     t.log("Quitting chrome driver...")
@@ -24,13 +25,14 @@ def cmd_exit(t: DTerminal, driver: selenium.webdriver):
 
 def cmd_info(t: DTerminal, data: dict):
     # TODO: make less ugly
-    t.disp(title="About", message=f"Version: {data['version']}\nFunctionality: {data['functionality']}\nAuthors: {', '.join(data['authors'])}\n")
+    t.disp(title="About",
+           message=f"Version: {data['version']}\nFunctionality: {data['functionality']}\nAuthors: {', '.join(data['authors'])}\n")
 
 
 def cmd_clear(t: DTerminal):
     t.clear()
     hcolor = DColors.rgb(20, 148, 20)
-    t.header("DCS Terminal", DColors.bold+DColors.reverse+hcolor+DColors.bg_black)
+    t.header("DCS Terminal", DColors.bold + DColors.reverse + hcolor + DColors.bg_black)
 
 
 def cmd_modify_savedata(data_name: str, new_data: object, t: DTerminal, jm: JSONManager):
@@ -94,7 +96,7 @@ def cmd_checkcredentials(t: DTerminal, jm: JSONManager, autoclear=False):
     if autoclear:
         time.sleep(3)
         cmd_clear(t)
-    
+
 
 def cmd_login(sm: SeleniumManager, t: DTerminal, jm: JSONManager):
     settings = jm.read()
@@ -102,11 +104,12 @@ def cmd_login(sm: SeleniumManager, t: DTerminal, jm: JSONManager):
     return
 
 
-def cmd_course_autosolve(start_link: str, sm: SeleniumManager, t: DTerminal, jm: JSONManager, autoreset=False):
+def cmd_course_autosolve(start_link: str, sm: SeleniumManager, t: DTerminal, jm: JSONManager, autoreset=None):
     settings = jm.read()
-    # t1 = threading.Thread(target=sm.auto_solve_course, args=[start_link, settings["timeout"], autoreset])
-    # t1.start()
-    sm.auto_solve_course(starting_link=start_link, timeout=settings["timeout"], reset_course=autoreset)
+    if autoreset is None:
+        autoreset = settings["autoreset"]
+    sm.auto_solve_course(starting_link=start_link, timeout=settings["timeout"], reset_course=autoreset,
+                         wait_length=settings["wait"])
     return
 
 
@@ -120,32 +123,33 @@ def cmd_get_answers(start_link: str, sm: SeleniumManager, t: DTerminal):
 def main():
     # TODO: make this look good
     theme = DTheme(
-        default=(DColors.green+DColors.bold+DColors.reverse, DColors.bwhite, DColors.green),
-        log=(DColors.bgreen+DColors.rgb(10, 60, 10, True), DColors.green+DColors.rgb(10, 60, 10, True), DColors.bwhite + DColors.rgb(70, 200, 70)),
-        error=(DColors.red+DColors.bold+DColors.reverse, DColors.bred, DColors.rgb(200, 70, 70)),
-    )  
-    
+        default=(DColors.green + DColors.bold + DColors.reverse, DColors.bwhite, DColors.green),
+        log=(DColors.bgreen + DColors.rgb(10, 60, 10, True), DColors.green + DColors.rgb(10, 60, 10, True),
+             DColors.bwhite + DColors.rgb(70, 200, 70)),
+        error=(DColors.red + DColors.bold + DColors.reverse, DColors.bred, DColors.rgb(200, 70, 70)),
+    )
+
     terminal = DTerminal(theme=theme)
     terminal.startup()
-    
+
     dir = os.path.dirname(os.path.realpath(__file__))
     jsonmanager = JSONManager(fp=dir)
     terminal.log("JSON manager loaded")
     settings = jsonmanager.read()
-    
+
     options = uc.ChromeOptions()
     terminal.log("Selenium options loaded")
-    if not settings["visible"]: 
+    if not settings["visible"]:
         terminal.log("Chrome startup window disabled.")
         options.add_argument('--no-startup-window')
         options.add_argument('--headless')
     # options.add_experimental_option("prefs", {"credentials_enable_service": False, "profile": {"password_manager_enabled": False}})
     driver = uc.Chrome(options=options)
     terminal.log("--Undetected driver successfully created--")
-    
+
     seleniummanager = SeleniumManager(driver=driver, terminal=terminal)
     terminal.log("*Selenium manager initialized*")
-    
+
     # all commands need to be put in here
     commands = [
         ("exit", cmd_exit, [], [], {"t": terminal, "driver": driver}),
@@ -155,30 +159,31 @@ def main():
         ("setcreds", cmd_setcredentials, [str, str], [], {"t": terminal, "jm": jsonmanager}),
         ("checkcreds", cmd_checkcredentials, [], ["--autoclear"], {"t": terminal, "jm": jsonmanager}),
         ("login", cmd_login, [], [], {"sm": seleniummanager, "t": terminal, "jm": jsonmanager}),
-        ("solvecourse", cmd_course_autosolve, [str], ["--autoreset"], {"sm": seleniummanager, "t": terminal, "jm": jsonmanager}),
+        ("solvecourse", cmd_course_autosolve, [str], ["--autoreset"],
+         {"sm": seleniummanager, "t": terminal, "jm": jsonmanager}),
         ("answers", cmd_get_answers, [str], [], {"sm": seleniummanager, "t": terminal})
     ]
     parser = Parser(commands)
     parser.add_command("help", cmd_help, [str], [], {"t": terminal, "p": parser})
     parser.add_command("cmdlist", cmd_cmdlist, [], [], {"t": terminal, "p": parser})
-    
+
     terminal.log("Parser initialized.")
     terminal.log("Startup successful.")
-    
+
     time.sleep(1)
-    
+
     terminal.clear()
-    terminal.header("DCS Terminal", DColors.bold + DColors.reverse + DColors.rgb(20, 148, 20)+DColors.bg_black)
-    
+    terminal.header("DCS Terminal", DColors.bold + DColors.reverse + DColors.rgb(20, 148, 20) + DColors.bg_black)
+
     while True:
         inp = terminal.prompt()
         if inp == "": continue
         info = parser.parse(inp)
-        
+
         if info[0] == "ERROR":
             terminal.error(info[1], info[2])
             continue
-            
+
         result = parser.execute(info)
         # Rough error logging
         if result and result[0] == "ERROR":

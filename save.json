@@ -1,1 +1,14 @@
-{"version": 1.0, "authors": ["Jackson Elia", "Andrew Combs"], "functionality": "Full Auto", "visible": true, "timeout": 15, "username": "", "password": ""}
+{
+  "version": 1.0,
+  "authors": [
+    "Jackson Elia",
+    "Andrew Combs"
+  ],
+  "functionality": "Full Auto",
+  "visible": true,
+  "timeout": 15,
+  "wait": 0,
+  "autoreset": false,
+  "username": "",
+  "password": ""
+}
