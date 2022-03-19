@@ -21,8 +21,12 @@ If everything worked properly, when you launch the application chrome should lau
 
 
 # Important to Know
+- **This program is only tested for and made for Windows**
 - **This program will not work for courses on spreadsheets**
 - **If you get an error that says something about chromedriver and or its version, make sure you have chrome updated to version 99**
+- **If you see an error message like the following when you first start the program, just press enter a few times and everything should still work**
+![image](https://user-images.githubusercontent.com/85963782/159139040-b648bd1b-35cd-4b39-94b0-d4d2fa81bd2c.png)
+
 
 # Motivation
 We are both very passionate about programming and learning new things, but we shared a hatred of datacamp. When we found out that all of the answers to the exercises were in the page's source code, we new we had to exploit such an obvious vulnerability. Its about the principle! Not about cheating on Datacamp! We made this in order to learn more about websites, Selenium, and the Terminal.
@@ -38,5 +42,9 @@ Datacamp has a lot of exploits, here are some of the biggest ones:
 - [Selenium](https://www.selenium.dev/documentation/)
 - [Undetected-Chromedriver](https://pypi.org/project/undetected-chromedriver/2.1.1/)
 
+# Credit
+Terminal/GUI by iBrushC
+
+Autosolving of the courses by Traptricker
 
 MIT © [Traptricker](https://traptricker.github.io/) & [iBrushC](https://github.com/iBrushC)
