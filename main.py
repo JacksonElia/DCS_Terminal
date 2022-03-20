@@ -104,10 +104,8 @@ def cmd_login(sm: SeleniumManager, t: DTerminal, jm: JSONManager):
     return
 
 
-def cmd_course_autosolve(start_link: str, sm: SeleniumManager, t: DTerminal, jm: JSONManager, autoreset=None):
+def cmd_course_autosolve(start_link: str, sm: SeleniumManager, t: DTerminal, jm: JSONManager, autoreset=False):
     settings = jm.read()
-    if autoreset is None:
-        autoreset = settings["autoreset"]
     sm.auto_solve_course(starting_link=start_link, timeout=settings["timeout"], reset_course=autoreset,
                          wait_length=settings["wait"])
     return
