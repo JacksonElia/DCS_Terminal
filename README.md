@@ -2,7 +2,7 @@
 <hr>
 This program will automatically finish a datacamp course in minutes using a hacker-esque terminal! It has a few important commands and settings to know about, so either watch <a href="https://youtu.be/XNE_BJatHzE">this</a> video, or continue reading this readme. <a href="https://youtu.be/KC-bnrYZPH0">This</a> is a video of the terminal solving a full course.
 
-4# How to use it
+# How to use it
 Go to ![image](https://user-images.githubusercontent.com/85963782/150718639-bec6b20b-f788-4d28-9315-25d33103b6ca.png) and download the latest release's installer (should be an exe.) Once downloaded, run the installer and if a popup appears saying "Windows protected your PC", click `more info` then `Run anyway`. Click `next` on the installer (making a desktop shortcut is recommended) then click `install` and `finish`.
 
 If everything worked properly, when you launch the application chrome should launch and you should see this window:
