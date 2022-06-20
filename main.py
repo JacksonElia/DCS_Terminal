@@ -8,11 +8,11 @@ from parser import Parser
 from terminal import DTerminal, DColors, DTheme
 from savedata import JSONManager
 from seleniummanager import SeleniumManager
+from webdriver_auto_update import check_driver
 
 import time
 import undetected_chromedriver as uc
 import selenium
-import threading
 
 
 # System commands
@@ -119,7 +119,9 @@ def cmd_get_answers(start_link: str, sm: SeleniumManager, t: DTerminal):
 
 
 def main():
-    # TODO: make this look good
+    # Makes sure chromedriver is up to date
+    check_driver("")
+
     theme = DTheme(
         default=(DColors.green + DColors.bold + DColors.reverse, DColors.bwhite, DColors.green),
         log=(DColors.bgreen + DColors.rgb(10, 60, 10, True), DColors.green + DColors.rgb(10, 60, 10, True),
