@@ -8,12 +8,13 @@ import errno
 import os
 
 # TODO: store data better
-version = 1.0
+version = 1.3
 authors = ["Jackson Elia", "Andrew Combs"]
 functionality = "Full Auto"
 
 visible = True
 timeout = 15
+wait = 0
 
 username = ""
 password = ""
@@ -36,6 +37,7 @@ class JSONManager(object):
                 "functionality": functionality,
                 "visible": visible,
                 "timeout": timeout,
+                "wait": wait,
                 "username": username,
                 "password": password,
             }
