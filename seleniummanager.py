@@ -77,7 +77,7 @@ class SeleniumManager:
             # Finds the user profile to ensure that the login was registered
             try:
                 WebDriverWait(self.driver, timeout=timeout).until(lambda d: d.find_element(By.XPATH,
-                    '//*[@id="single-spa-application:@dcmfe/mfe-app-atlas-header"]/nav/div[4]/div[2]/div/button'))
+                    '//*[@id="menu-trigger-F2FCJp"]'))
                 self.t.log("*****************")
                 self.t.log("Sign In Confirmed")
                 self.t.log("*****************")
