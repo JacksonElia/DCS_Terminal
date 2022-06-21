@@ -33,8 +33,9 @@ If everything worked properly, when you launch the application chrome should lau
 # Important to Know
 - **This program is only tested for and made for Windows**
 - **This program will not work for courses on spreadsheets**
-- **If you get an error that says something about chromedriver and or its version, make sure you have chrome updated to version 99**
+- **If you get an error that says something about chromedriver and or its version, make sure you have chrome updated**
 - **If you see an error message like the following when you first start the program, just press enter a few times and everything should still work**
+- **When you open the program for the first time, make sure you are connected ot the internet or it will crash**
 ![image](https://user-images.githubusercontent.com/85963782/159139040-b648bd1b-35cd-4b39-94b0-d4d2fa81bd2c.png)
 
 
