@@ -52,6 +52,7 @@ Datacamp has a lot of exploits, here are some of the biggest ones:
 # Frameworks, Tools, and Libraries used
 - [Selenium](https://www.selenium.dev/documentation/)
 - [Undetected-Chromedriver](https://pypi.org/project/undetected-chromedriver/2.1.1/)
+- [Webdrive Auto Update](https://pypi.org/project/webdriver-auto-update/)
 
 # Credit
 Terminal/GUI by iBrushC
