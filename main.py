@@ -2,12 +2,14 @@
 main.py: Responsible for all main functions and testing
 Contributors: Jackson Elia, Andrew Combs
 """
+import os
+
 from terminal_parser import *
 from terminal import *
 from savedata import *
 from seleniummanager import *
 from webdriver_auto_update import check_driver
-
+from multiprocessing import freeze_support
 import time
 import undetected_chromedriver as uc
 import selenium
@@ -118,7 +120,7 @@ def cmd_get_answers(start_link: str, sm: SeleniumManager, t: DTerminal):
 
 def main():
     # Makes sure chromedriver is up to date
-    check_driver("")
+    # check_driver("")
 
     theme = DTheme(
         default=(DColors.green + DColors.bold + DColors.reverse, DColors.bwhite, DColors.green),
@@ -190,4 +192,5 @@ def main():
 
 
 if __name__ == "__main__":
+    freeze_support()
     main()

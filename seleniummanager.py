@@ -1,7 +1,7 @@
 """
 seleniummanager.py: Responsible for everything to do with Selenium including launching the webdriver, getting the
 the solutions to the Datacamp questions, and solving the questions.
-Contributors: Jackson Elia, Andrew Combs
+Contributors: Jackson Elia
 """
 import pyperclip
 import selenium
@@ -23,7 +23,6 @@ from terminal import DColors, DTerminal
 from typing import List, Tuple
 
 
-# TODO: Integrate terminal instead of using self.t.log
 class SeleniumManager:
     driver: selenium.webdriver
 
