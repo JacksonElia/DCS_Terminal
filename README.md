@@ -3,7 +3,7 @@
 This program will automatically finish a datacamp course in minutes using a hacker-esque terminal! It has a few important commands and settings to know about, so either watch <a href="https://youtu.be/XNE_BJatHzE">this</a> video, or continue reading this readme. <a href="https://youtu.be/KC-bnrYZPH0">This</a> is a video of the terminal solving a full course.
 
 # How to use it
-Go to ![image](https://user-images.githubusercontent.com/85963782/150718639-bec6b20b-f788-4d28-9315-25d33103b6ca.png) and download the latest release's installer (should be an exe.) Once downloaded, run the installer and if a popup appears saying "Windows protected your PC", click `more info` then `Run anyway`. Click `next` on the installer (making a desktop shortcut is recommended) then click `install` and `finish`.
+Go to [Releases](https://github.com/JacksonElia/DCS_Terminal/releases) and download the latest release's installer (should be an exe.) Once downloaded, run the installer and if a popup appears saying "Windows protected your PC", click `more info` then `Run anyway`. Click `next` on the installer (making a desktop shortcut is recommended) then click `install` and `finish`.
 
 If everything worked properly, when you launch the application chrome should launch and you should see this window:
 
@@ -33,7 +33,7 @@ If everything worked properly, when you launch the application chrome should lau
 # Important to Know
 - **This program is only tested for and made for Windows**
 - **This program will not work for courses on spreadsheets**
-- **If you get an error that says something about chromedriver and or its version, make sure you have chrome updated**
+- **If it crashes as soon as you open it or you get an error that says something about chromedriver and or its version, make sure you have chrome updated**
 - **If you see an error message like the following when you first start the program, just press enter a few times and everything should still work**
 - **When you open the program for the first time, make sure you are connected ot the internet or it will crash**
 ![image](https://user-images.githubusercontent.com/85963782/159139040-b648bd1b-35cd-4b39-94b0-d4d2fa81bd2c.png)
@@ -52,7 +52,6 @@ Datacamp has a lot of exploits, here are some of the biggest ones:
 # Frameworks, Tools, and Libraries used
 - [Selenium](https://www.selenium.dev/documentation/)
 - [Undetected-Chromedriver](https://pypi.org/project/undetected-chromedriver/2.1.1/)
-- [Webdrive Auto Update](https://pypi.org/project/webdriver-auto-update/)
 
 # Credit
 Terminal/GUI by iBrushC
