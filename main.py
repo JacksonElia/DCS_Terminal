@@ -4,7 +4,7 @@ Contributors: Jackson Elia, Andrew Combs
 """
 import os
 
-from parser import Parser
+from terminal_parser import Parser
 from terminal import DTerminal, DColors, DTheme
 from savedata import JSONManager
 from seleniummanager import SeleniumManager
