@@ -8,7 +8,6 @@ from terminal_parser import *
 from terminal import *
 from savedata import *
 from seleniummanager import *
-from webdriver_auto_update import check_driver
 from multiprocessing import freeze_support
 import time
 import undetected_chromedriver as uc
@@ -85,7 +84,6 @@ def cmd_setcredentials(username: str, password: str, t: DTerminal, jm: JSONManag
     t.log(f"Set new password: {password}")
     jm.write(settings)
     t.log("Successfully set username and password.\n")
-
     return
 
 
@@ -96,6 +94,14 @@ def cmd_checkcredentials(t: DTerminal, jm: JSONManager, autoclear=False):
     if autoclear:
         time.sleep(3)
         cmd_clear(t)
+
+
+def cmd_setwait(wait_time: int, t: DTerminal, jm: JSONManager):
+    settings = jm.read()
+    settings["wait"] = wait_time
+    jm.write(settings)
+    t.log(f"Set new wait time: {wait_time}s")
+    return
 
 
 def cmd_login(sm: SeleniumManager, t: DTerminal, jm: JSONManager):
@@ -119,8 +125,6 @@ def cmd_get_answers(start_link: str, sm: SeleniumManager, t: DTerminal):
 
 
 def main():
-    # Makes sure chromedriver is up to date
-    # check_driver("")
 
     theme = DTheme(
         default=(DColors.green + DColors.bold + DColors.reverse, DColors.bwhite, DColors.green),
@@ -160,8 +164,9 @@ def main():
         ("checkcreds", cmd_checkcredentials, [], ["--autoclear"], {"t": terminal, "jm": jsonmanager}),
         ("login", cmd_login, [], [], {"sm": seleniummanager, "t": terminal, "jm": jsonmanager}),
         ("solvecourse", cmd_course_autosolve, [str], ["--autoreset"],
-         {"sm": seleniummanager, "t": terminal, "jm": jsonmanager}),
-        ("answers", cmd_get_answers, [str], [], {"sm": seleniummanager, "t": terminal})
+            {"sm": seleniummanager, "t": terminal, "jm": jsonmanager}),
+        ("answers", cmd_get_answers, [str], [], {"sm": seleniummanager, "t": terminal}),
+        ("setwait", cmd_setwait, [int], [], {"t": terminal, "jm": jsonmanager}),
     ]
     parser = Parser(commands)
     parser.add_command("help", cmd_help, [str], [], {"t": terminal, "p": parser})
