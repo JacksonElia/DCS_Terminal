@@ -8,7 +8,7 @@ import errno
 import os
 
 # TODO: store data better
-version = 1.3
+version = 1.4
 authors = ["Jackson Elia", "Andrew Combs"]
 functionality = "Full Auto"
 
