@@ -2,12 +2,10 @@
 main.py: Responsible for all main functions and testing
 Contributors: Jackson Elia, Andrew Combs
 """
-import os
-
-from terminal_parser import Parser
-from terminal import DTerminal, DColors, DTheme
-from savedata import JSONManager
-from seleniummanager import SeleniumManager
+from terminal_parser import *
+from terminal import *
+from savedata import *
+from seleniummanager import *
 from webdriver_auto_update import check_driver
 
 import time
