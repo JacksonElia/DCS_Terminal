@@ -59,4 +59,4 @@ Terminal/GUI by iBrushC
 
 Autosolving of the courses by me
 
-MIT © [Jackson Elia](https://github.com/JacksonElia) & [iBrushC](https://github.com/iBrushC)
+MIT © 2023 [Jackson Elia](https://github.com/JacksonElia) & [iBrushC](https://github.com/iBrushC)
