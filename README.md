@@ -57,6 +57,6 @@ Datacamp has a lot of exploits, here are some of the biggest ones:
 # Credit
 Terminal/GUI by iBrushC
 
-Autosolving of the courses by Traptricker
+Autosolving of the courses by me
 
-MIT © [Traptricker](https://traptricker.github.io/) & [iBrushC](https://github.com/iBrushC)
+MIT © [Jackson Elia](https://github.com/JacksonElia) & [iBrushC](https://github.com/iBrushC)
